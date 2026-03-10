@@ -1,33 +1,48 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
-const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/groceryapp';
+const mongoURI = process.env.MONGO_URI || "mongodb://localhost:27017/groceryapp";
 
 if (!mongoURI) {
-    throw new Error('MONGO_URI is not defined in environment variables');
+  throw new Error("MONGO_URI is not defined in environment variables");
 }
 
-const cache = global.mongoose;
-
-if (!cache) {
-    global.mongoose = { conn: null, promise: null };
+// Next.js hot reload fix: cache the connection
+declare global {
+  // eslint-disable-next-line no-var
+  var mongoose: {
+    conn: mongoose.Connection | null;
+    promise: Promise<mongoose.Connection> | null;
+  };
 }
+
+const globalAny: any = global;
 
 const connectDB = async () => {
-    if (cache.conn) {
-        return cache.conn;
-    }
+  if (!globalAny.mongoose) {
+    globalAny.mongoose = { conn: null, promise: null };
+  }
 
-    if (!cache.promise) {
-        cache.promise = mongoose.connect(mongoURI).then((conn) =>conn.connection)
-    }
-    try{
-        const conn=await cache.promise 
-        return conn 
-    } catch (error) {
-        console.error('Error connecting to MongoDB:', error);
-        process.exit(1);
-    }
+  if (globalAny.mongoose.conn) {
+    return globalAny.mongoose.conn;
+  }
 
-}
+  if (!globalAny.mongoose.promise) {
+    globalAny.mongoose.promise = mongoose
+      .connect(mongoURI)
+      .then((m) => m.connection)
+      .catch((err) => {
+        console.error("MongoDB connection error:", err);
+        throw err;
+      });
+  }
+
+  try {
+    globalAny.mongoose.conn = await globalAny.mongoose.promise;
+    return globalAny.mongoose.conn;
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
+    throw error;
+  }
+};
 
 export default connectDB;
