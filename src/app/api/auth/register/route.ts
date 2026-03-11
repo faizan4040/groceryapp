@@ -9,10 +9,10 @@ export async function POST(req: Request) {
     await connectDB();
 
     const body = await req.json();
-    const { name, email, password } = body;
+    const { name, email, password, mobile } = body;
 
     // validation
-    if (!name || !email || !password) {
+    if (!name || !email || !password || !mobile) {
       return NextResponse.json(
         { message: "All fields are required" },
         { status: 400 }
@@ -43,6 +43,7 @@ export async function POST(req: Request) {
     const newUser = await User.create({
       name,
       email,
+      mobile,
       password: hashedPassword,
     });
 
@@ -54,6 +55,7 @@ export async function POST(req: Request) {
           id: newUser._id,
           name: newUser.name,
           email: newUser.email,
+          mobile: newUser.mobile,
         },
       },
       { status: 201 }
@@ -77,35 +79,3 @@ export async function POST(req: Request) {
 
 
 
-// import connectDB from "@/lib/db";
-// import User from "@/models/user.models";
-// import bcrypt from "bcryptjs";
-// import { NextResponse } from "next/server";
-
-// export async function POST(request: Request) {
-//     try{
-//         await connectDB()
-//         const {name, email, password}=await request.json()
-//         const existingUser=await User.findOne({email})
-//         if(existingUser){
-//             return NextResponse.json(
-//                 {message:"User already exists"}, 
-//                 {status:400}
-//             )
-//     }
-//     if(password.length<6){
-//         return NextResponse.json(
-//             {message:"Password must be at least 6 characters long"}, 
-//             {status:400}
-//         )
-//     }
-
-//     const hashedPassword=await bcrypt.hash(password,10)
-//     const user=await User.create({
-//         name, email, password:hashedPassword
-//     })
-
-//     } catch (error) {
-//         return NextResponse.json({message:"Internal Server Error"}, {status:500})
-//     }
-// }

@@ -1,6 +1,9 @@
+// 'use client'
 import type { Metadata } from "next";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
+import { Provider } from "@/Provider";
+
 
 export const metadata: Metadata = {
   title: "FreshCart | 30 minutes grocery Delivery",
@@ -15,7 +18,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="w-full min-h-screen bg-linear-to-b from-green-200 to-white">
-        {children}
+        <Provider>
+         {children}
+        </Provider>
          <Toaster position="top-right" />
       </body>
     </html>
