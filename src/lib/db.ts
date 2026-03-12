@@ -6,9 +6,7 @@ if (!mongoURI) {
   throw new Error("MONGO_URI is not defined in environment variables");
 }
 
-// Next.js hot reload fix: cache the connection
 declare global {
-  // eslint-disable-next-line no-var
   var mongoose: {
     conn: mongoose.Connection | null;
     promise: Promise<mongoose.Connection> | null;

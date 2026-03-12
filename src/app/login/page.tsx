@@ -57,7 +57,7 @@ const Login = ({ nextStep }: propType) => {
       localStorage.setItem("token", result.data.token);
 
       // Redirect
-      router.push("/dashboard");
+      router.push("/");
 
       setEmail("");
       setPassword("");
@@ -65,7 +65,6 @@ const Login = ({ nextStep }: propType) => {
     } catch (error: any) {
 
       console.log(error);
-
       toast.error(
         error?.response?.data?.message || "Login failed"
       );
@@ -80,7 +79,7 @@ const Login = ({ nextStep }: propType) => {
 
       {/* Back Button */}
       <div
-        onClick={() => nextStep(1)}
+        onClick={() => router.back()} // Go back to previous page
         className="absolute top-5 left-4 sm:left-6 flex items-center gap-2 text-green-700 hover:text-green-800 transition cursor-pointer"
       >
         <ArrowLeft size={20} />

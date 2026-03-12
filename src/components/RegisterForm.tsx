@@ -32,45 +32,48 @@ const RegisterForm = ({ previousStep }: PropType) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const handleRegister = async (e:React.FormEvent) => {
-    e.preventDefault();
+const handleRegister = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-    if (!name || !email || !password || !mobile) {
-      toast.error("Please fill all fields");
-      return;
-    }
+  if (!name || !email || !password || !mobile) {
+    toast.error("Please fill all fields");
+    return;
+  }
 
-    try {
-      setLoading(true);
+  try {
+    setLoading(true);
 
-      const result = await axios.post("/api/auth/register", {
-        name,
-        email,
-        mobile,
-        password,
-      });
+    const { data } = await axios.post("/api/auth/register", {
+      name,
+      email,
+      mobile,
+      password,
+    });
 
-      toast.success("Account created successfully");
+    // Check if registration was successful
+    if (data.success) {
+      toast.success(data.message); // "User registered successfully"
 
-      console.log(result.data);
-
+      // Clear form
       setName("");
       setEmail("");
       setMobile("");
       setPassword("");
 
-    } catch (error: any) {
-
-      console.log(error);
-
-      toast.error(
-        error?.response?.data?.message || "Registration failed"
-      );
-
-    } finally {
-      setLoading(false);
+      setTimeout(() => {
+        window.location.href = "/login"; 
+      }, 500); 
+    } else {
+      toast.error(data.message || "Registration failed");
     }
-  };
+
+  } catch (error: any) {
+    console.log(error);
+    toast.error(error?.response?.data?.message || "Registration failed");
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="flex items-center justify-center min-h-screen w-full px-4 sm:px-6 lg:px-8 py-10 bg-linear-to-br from-green-50 via-white to-green-100 relative">

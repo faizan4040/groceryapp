@@ -8,4 +8,5 @@ export const IMAGES = {
   deliveryBike,
   cart,
   Google,
+
 };

@@ -66,7 +66,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             image: user.image,
             role: "user",
           });
-        }
+        }  
         user.id = dbUser._id.toString();
         user.role = dbUser.role;
       }
