@@ -47,7 +47,7 @@ const PromoSection = () => {
   const { h, m, s } = useCountdown(5);
 
   return (
-    <section className="w-[94%] mx-auto py-12 md:py-16">
+    <section className="w-[94%] mx-auto py-12 md:py-24">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6">
 
         {/* ══ CARD 1 — FLASH SALE ══ */}
