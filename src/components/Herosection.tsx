@@ -15,7 +15,7 @@ const Herosection = () => {
         playsInline
         className="absolute inset-0 w-full h-full object-cover"
       >
-         {/* <source src="/videos/grocery.mp4" type="video/mp4" /> */}
+         <source src="/videos/grocery.mp4" type="video/mp4" />
       </video>
 
       {/* Dark Overlay */}

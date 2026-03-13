@@ -14,59 +14,50 @@ import Customer from "@/components/Customer";
 import NewsLetter from "@/components/NewsLetter";
 import Footer from "@/components/Footer";
 
-const Home = async () => {
 
+const PageShell = ({ user }: { user?: any }) => (
+  <div>
+    <Navbar user={user} />
+    <Herosection />
+    <Category />
+    <FeatureProduct />
+    <InfoProducts />
+    <BestSeller />
+    <Customer />
+    <NewsLetter />
+    <Footer />
+  </div>
+);
+
+const Home = async () => {
   const session = await auth();
 
-  // If NOT logged in → show landing page
+  /* ── Not logged in → public landing page ── */
   if (!session?.user?.id) {
-    return (
-      <div>
-        <Navbar/>
-        <Herosection/>
-        <Category/>
-        <FeatureProduct/>
-        <InfoProducts/>
-        <BestSeller/>
-        <Customer/>
-        <NewsLetter/>
-        <Footer/>
-      </div>
-    );
+    return <PageShell />;
   }
 
+  /* ── Logged in → fetch user from DB ── */
   await connectDB();
+  const user = await User.findById(session.user.id).lean();
 
-  const user = await User.findById(session.user.id);
-
+  /* ── User record missing → force re-login ── */
   if (!user) {
     redirect("/login");
   }
 
-  const inComplete =
-    !user.mobile || !user.role || (!user.mobile && user.role === "user");
+  /* ── Profile incomplete → collect mobile / role ── */
+  const isIncomplete = !user.mobile || !user.role || user.role === "user" && !user.mobile;
 
-  if (inComplete) {
+  if (isIncomplete) {
     return <EditRolemobile />;
   }
 
-  return (
-    <div>
-      <Navbar user={user}/>
-      <Herosection/>
-        <Category/>
-        <FeatureProduct/>
-        <InfoProducts/>
-        <BestSeller/>
-        <Customer/>
-        <NewsLetter/>
-        <Footer/>
-    </div>
-  );
+  /* ── Fully authenticated user ── */
+  return <PageShell user={user} />;
 };
 
 export default Home;
-
 
 
 
