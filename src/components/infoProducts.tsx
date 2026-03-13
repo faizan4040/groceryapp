@@ -130,11 +130,11 @@ const PromoSection = () => {
                 <div className="absolute inset-0 bg-white/20 rounded-full blur-2xl scale-110" />
                 <div className="relative w-full h-full bg-white/10 backdrop-blur-sm rounded-3xl border border-white/20 flex items-center justify-center overflow-hidden">
                   <Image
-                    src="/promo/dairy.png"
+                    src="/categories/dairy.jpg"
                     alt="Dairy Sale"
                     fill
                     sizes="176px"
-                    className="object-contain p-4"
+                    className="object-contain p-4 rounded-2xl"
                     priority
                     onError={(e) => {
                       (e.target as HTMLImageElement).style.display = "none";
