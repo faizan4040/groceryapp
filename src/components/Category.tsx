@@ -10,9 +10,9 @@ const categories = [
   { name: "Fruits",     image: "/categories/fruits.jpg",     emoji: "🍎" },
   { name: "Dairy",      image: "/categories/dairy.jpg",      emoji: "🥛" },
   { name: "Bakery",     image: "/categories/bakery.jpg",     emoji: "🍞" },
-  { name: "Meat & Fish",image: "/categories/meat.jpg",       emoji: "🥩" },
-  { name: "Beverages",  image: "/categories/beverages.jpg",  emoji: "🧃" },
-  { name: "Snacks",     image: "/categories/snacks.jpg",     emoji: "🍿" },
+  { name: "Meat & Fish",image: "/categories/fruits.jpg",       emoji: "🥩" },
+  { name: "Beverages",  image: "/categories/vegetables.jpg",  emoji: "🧃" },
+  { name: "Snacks",     image: "/categories/vegetables.jpg",     emoji: "🍿" },
   { name: "Organic",    image: "/categories/organic.jpg",    emoji: "🌿" },
 ];
 
