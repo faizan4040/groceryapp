@@ -29,3 +29,5 @@ declare module "next-auth/jwt" {
     mobile:  string | null      // added
   }
 }
+
+

@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     const unit     = formData.get("unit")     as string;
     const price    = formData.get("price")    as string;
     const file     = formData.get("file")     as string;
-    const image    = formData.get("image")    as Blob;   // was "file" before
+    const image    = formData.get("image")    as Blob;  
 
     // Validate required fields before uploading
     if (!name || !category || !unit || !price || !image) {

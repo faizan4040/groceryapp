@@ -30,7 +30,7 @@ export async function middleware(req: NextRequest) {
   if (!role) {
     return NextResponse.redirect(new URL("/edit-role", req.url));
   }
-
+    
   // Role-based protection
   if (pathname.startsWith("/user") && role !== "user") {
     return NextResponse.redirect(new URL("/unauthorized", req.url));
@@ -56,35 +56,3 @@ export const config = {
 };
 
 
-
-
-
-
-// import { getToken } from "next-auth/jwt";
-// import { NextRequest, NextResponse } from "next/server";
-
-
-// export async function proxy(req:NextRequest){
-    
-//     const {pathname}=req.nextUrl
-    
-//     const publicRoutes=["/login","/register","/api/auth","favicons.ico", "/_next"]
-//      if(publicRoutes.some((path)=>pathname.startsWith(path))){
-//          return NextResponse.next()
-//      }
-
-//      const token = await getToken({req,secret:process.env.AUTH_SECRET})
-//      console.log(token)
-//      console.log(req.url)
-//      if(!token){
-//         const loginUrl=new URL("/login", req.url)
-//         loginUrl.searchParams.set("callbackUrl",req.url)
-//         return NextResponse.redirect(loginUrl)
-//      }
-//      return NextResponse.next()
-// }
-
-
-
-
-// // req-------middleware------server

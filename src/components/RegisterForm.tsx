@@ -32,7 +32,7 @@ const RegisterForm = ({ previousStep }: PropType) => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
-const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
   e.preventDefault();
 
   if (!name || !email || !password || !mobile) {
@@ -61,7 +61,7 @@ const handleRegister = async (e: React.FormEvent) => {
       setPassword("");
 
       setTimeout(() => {
-        window.location.href = "/login"; 
+        window.location.href = "/login";
       }, 500); 
     } else {
       toast.error(data.message || "Registration failed");
