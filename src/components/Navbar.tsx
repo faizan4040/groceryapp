@@ -139,9 +139,6 @@ const Navbar = ({ user }: { user?: IUser }) => {
 
   return (
     <>
-      {/* ══════════════════════════════════════════
-          MOBILE SIDEBAR
-      ══════════════════════════════════════════ */}
       <AnimatePresence>
         {sidebarOpen && (
           <>
@@ -223,7 +220,7 @@ const Navbar = ({ user }: { user?: IUser }) => {
                 </div>
               </div>
 
-              {/* Nav Links */}
+              {/* admin Nav Links */}
               <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
 
                 {/* Admin-only section */}
@@ -291,9 +288,6 @@ const Navbar = ({ user }: { user?: IUser }) => {
         )}
       </AnimatePresence>
 
-      {/* ══════════════════════════════════════════
-          NAVBAR
-      ══════════════════════════════════════════ */}
       <nav
         className="
           w-[95%] fixed top-3 left-1/2 -translate-x-1/2 z-50
@@ -347,7 +341,7 @@ const Navbar = ({ user }: { user?: IUser }) => {
                 </div>
               </button>
 
-              {/* ── Location Dropdown Panel ── */}
+              
               <AnimatePresence>
                 {locationOpen && (
                   <motion.div
@@ -373,7 +367,7 @@ const Navbar = ({ user }: { user?: IUser }) => {
                       </button>
                     </div>
 
-                    {/* Detect GPS */}
+                  
                     <button
                       onClick={detectLocation}
                       disabled={detecting}
@@ -400,7 +394,7 @@ const Navbar = ({ user }: { user?: IUser }) => {
                       <div className="flex-1 h-px bg-gray-200" />
                     </div>
 
-                    {/* Search Input */}
+                   
                     <div className="relative mb-2">
                       <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                       <input
@@ -419,7 +413,7 @@ const Navbar = ({ user }: { user?: IUser }) => {
                       )}
                     </div>
 
-                    {/* Results */}
+                   
                     {results.length > 0 && (
                       <div className="max-h-52 overflow-y-auto rounded-xl border border-gray-100 divide-y divide-gray-50">
                         {results.map((item: any) => (
@@ -449,17 +443,21 @@ const Navbar = ({ user }: { user?: IUser }) => {
           </div>
 
           {/* ────────── CENTER: Search bar — desktop only ────────── */}
-          <div className="flex-1 max-w-xl mx-4 hidden md:block">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={17} />
-              <input
-                type="text"
-                placeholder="Search for fruits, vegetables, dairy…"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 transition"
-              />
-            </div>
+         {isAdmin ? (
+        <div></div>
+      ) : (
+        <div className="flex-1 max-w-xl mx-4 hidden md:block">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={17} />
+            <input
+              type="text"
+              placeholder="Search for fruits, vegetables, dairy…"
+              className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+            />
           </div>
-
+        </div>
+      )}
+         
           {/* ────────── RIGHT: Role Badge (desktop) + User + Cart ────────── */}
           <div className="flex items-center gap-3 md:gap-4 shrink-0">
 
@@ -583,7 +581,7 @@ const Navbar = ({ user }: { user?: IUser }) => {
                       </>
                     )}
 
-                    {/* Actions */}
+                    
                     <div className="py-1">
                       <Link
                         href="/orders"
@@ -633,6 +631,7 @@ const Navbar = ({ user }: { user?: IUser }) => {
             />
           </div>
         </div>
+
       </nav>
 
       <div className="h-12 md:h-4" />

@@ -1,81 +1,43 @@
-import React from "react";
-import { auth } from "@/auth";
-import EditRolemobile from "@/components/EditRolemobile";
-import connectDB from "@/lib/db";
-import User from "@/models/user.models";
-import { redirect } from "next/navigation";
-import Navbar from "@/components/Navbar";
-import Herosection from "@/components/Herosection";
-import Category from "@/components/Category";
-import FeatureProduct from "@/components/FeatureProduct";
-import InfoProducts from "@/components/infoProducts";
-import BestSeller from "@/components/BestSeller";
-import Customer from "@/components/Customer";
-import NewsLetter from "@/components/NewsLetter";
-import Footer from "@/components/Footer";
-import UserDashboard from "@/components/UserDashboard";
-import AdminDashboard from "@/components/AdminDashboard";
-import DevliveryBoy from "@/components/DevliveryBoy";
+import { auth } from '@/auth'
+import React from 'react'
+import connectDB from '@/lib/db'
+import User from '@/models/user.models'
+import { redirect } from 'next/navigation'
+import EditRolemobile from '@/components/EditRolemobile'
+import Navbar from '@/components/Navbar'
+import UserDashboard from '@/components/UserDashboard'
+import DevliveryBoy from '@/components/DevliveryBoy'
+import AdminDashboard from '@/components/AdminDashboard'
 
-interface PageShellProps {
-  user?: any;
-}
 
-const PageShell: React.FC<PageShellProps> = ({ user }) => {
-  const renderDashboard = () => {
-    if (!user) return null;
-    switch (user.role) {
-      case "user":
-        return <UserDashboard />;
-      case "admin":
-        return <AdminDashboard />;
-      case "delivery":
-        return <DevliveryBoy />;
-      default:
-        return null;
-    }
-  };
+const Home = async () => {
+
+  await connectDB()
+  const session=await auth()
+  const user=await User.findById(session?.user?.id)
+  if(!user){
+    redirect("/login")
+  }
+
+  const inComplete=!user.mobile || !user.role || (!user.mobile && user.role=="user")
+  if(inComplete){
+  return <EditRolemobile/>
+  }
+
+  const plainUser=JSON.parse(JSON.stringify(user))
+
 
   return (
     <div>
-      <Navbar user={user} />
-      {renderDashboard()}
-      <Herosection />
-      <Category />
-      <FeatureProduct />
-      <InfoProducts />
-      <BestSeller />
-      <Customer />
-      <NewsLetter />
-      <Footer />
+    <Navbar user={plainUser}/>
+    {user.role == "user" ? (
+      <UserDashboard/>
+    ) : user.role == "admin" ? (
+      <AdminDashboard/>
+    ) :<DevliveryBoy/> }
     </div>
-  );
-};
+  )
+}
 
-const Home = async () => {
-  const session = await auth();
+export default Home
 
-  // Not logged in → public landing page
-  if (!session?.user?.id) {
-    return <PageShell />;
-  }
-
-  // Logged in → fetch user from DB
-  await connectDB();
-  const user = await User.findById(session.user.id).lean();
-
-  // User record missing → force re-login
-  if (!user) {
-    redirect("/login");
-  }
-
-  // Check for incomplete profile
-  const isIncomplete = !user.role || !user.mobile;
-  if (isIncomplete) {
-    return <EditRolemobile />;
-  }
-
-  return <PageShell user={JSON.parse(JSON.stringify(user))} />;
-};
-
-export default Home;

@@ -201,7 +201,7 @@ const RegisterForm = ({ previousStep }: PropType) => {
             whileTap={{ scale: 0.97 }}
             type="button"
             onClick={()=>signIn("google",{callbackUrl:"/"})}
-            className="flex items-center justify-center gap-3 border border-gray-200 py-3 rounded-xl text-sm sm:text-base font-medium text-gray-700 hover:bg-gray-50 transition"
+            className="flex cursor-pointer items-center justify-center gap-3 border border-gray-200 py-3 rounded-xl text-sm sm:text-base font-medium text-gray-700 hover:bg-gray-50 transition"
           >
             <Image
               src={IMAGES.Google}

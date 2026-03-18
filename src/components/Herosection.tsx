@@ -7,7 +7,6 @@ const Herosection = () => {
   return (
     <section className="w-[95%] mx-auto mt-28 relative rounded-3xl overflow-hidden">
 
-      {/* Background Video */}
       <video
         autoPlay
         loop
@@ -21,10 +20,10 @@ const Herosection = () => {
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/50"></div>
 
-      {/* Content */}
+      
       <div className="relative z-10 px-12 py-24 max-w-2xl">
 
-        {/* Badge */}
+    
         <motion.span
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -33,7 +32,7 @@ const Herosection = () => {
           FRESH & ORGANIC
         </motion.span>
 
-        {/* Heading */}
+
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -48,7 +47,7 @@ const Herosection = () => {
           </span>
         </motion.h1>
 
-        {/* Description */}
+       
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -59,7 +58,7 @@ const Herosection = () => {
           order. Sustainable farming, premium quality groceries delivered fast.
         </motion.p>
 
-        {/* Buttons */}
+       
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

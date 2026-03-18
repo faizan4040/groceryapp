@@ -6,14 +6,14 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 
 const categories = [
-  { name: "Vegetables", image: "/categories/vegetables.jpg", emoji: "🥦" },
-  { name: "Fruits",     image: "/categories/fruits.jpg",     emoji: "🍎" },
-  { name: "Dairy",      image: "/categories/dairy.jpg",      emoji: "🥛" },
-  { name: "Bakery",     image: "/categories/bakery.jpg",     emoji: "🍞" },
-  { name: "Meat & Fish",image: "/categories/fruits.jpg",       emoji: "🥩" },
-  { name: "Beverages",  image: "/categories/vegetables.jpg",  emoji: "🧃" },
-  { name: "Snacks",     image: "/categories/vegetables.jpg",     emoji: "🍿" },
-  { name: "Organic",    image: "/categories/organic.jpg",    emoji: "🌿" },
+  { name: "Vegetables", image: "/categories/vegetables.jpg",},
+  { name: "Fruits",     image: "/categories/fruits.jpg", },
+  { name: "Dairy",      image: "/categories/dairy.jpg", },
+  { name: "Bakery",     image: "/categories/bakery.jpg", },
+  { name: "Meat & Fish",image: "/categories/fruits.jpg",},
+  { name: "Beverages",  image: "/categories/vegetables.jpg",},
+  { name: "Snacks",     image: "/categories/vegetables.jpg",},
+  { name: "Organic",    image: "/categories/organic.jpg",},
 ];
 
 const Category = () => {
@@ -42,13 +42,6 @@ const Category = () => {
     <section className="w-[90%] mx-auto mt-16">
 
       {/* Header */}
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold text-gray-800">Shop by Category</h2>
-        <button className="text-green-600 font-semibold hover:underline text-sm">
-          View All
-        </button>
-      </div>
-
       <div className="relative">
 
         {/* Left Arrow */}
@@ -79,7 +72,7 @@ const Category = () => {
               <div className="w-24 h-24 flex items-center justify-center bg-green-50 rounded-full mb-3 overflow-hidden relative">
                 {imgErrors[i] ? (
                   /* Fallback when image is missing / broken */
-                  <span className="text-4xl select-none">{cat.emoji}</span>
+                  <span className="text-4xl select-none"></span>
                 ) : (
                   <Image
                     src={cat.image}

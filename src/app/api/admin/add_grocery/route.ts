@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import connectDB from "@/lib/db";
 import { NextRequest, NextResponse } from "next/server";
 import { uploadOnCloudinary } from "@/lib/cloudinary";
-import Grocery from "@/models/Grocery";
+import Grocery from "@/models/grocery.models";
 
 export async function POST(req: NextRequest) {
   try {

@@ -28,6 +28,7 @@ const EditRolemobile = () => {
   const router = useRouter();
   const { update } = useSession();
 
+
   const handleSubmit = async () => {
     if (!selectedRole) {
       toast.error("Please select a role");
@@ -42,7 +43,7 @@ const EditRolemobile = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post("/api/user/update-role-mobile", {
+      const res = await axios.post("/api/user/edit-role-mobile", {
         role: selectedRole,
         mobile,
       });
@@ -65,6 +66,8 @@ const EditRolemobile = () => {
       setLoading(false);
     }
   };
+
+
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-green-100 via-white to-yellow-100 p-6">
