@@ -40,13 +40,56 @@ const Home = async () => {
       {user.role === "user" ? (
         <UserDashboard />
       ) : user.role === "admin" ? (
-        <AdminDashboard />
+        <AdminDashboard children={undefined} />
       ) : (
         <DevliveryBoy />
       )}
     </div>
   )
 }
+
+
+// const Home = async () => {
+
+//   await connectDB()
+
+//   const session = await auth()
+
+//   if (!session?.user?.email) {
+//     redirect("/login")
+//   }
+
+//   const user = await User.findOne({ email: session.user.email })
+
+//   if (!user) {
+//     redirect("/login")
+//   }
+
+//   const inComplete = !user.mobile || !user.role
+
+//   if (inComplete) {
+//     return <EditRolemobile />
+//   }
+
+//   // ADD THIS (ADMIN REDIRECT)
+//   if (user.role === "admin") {
+//     redirect("/admin/dashboard")
+//   }
+
+//   const plainUser = JSON.parse(JSON.stringify(user))
+
+//   return (
+//     <div>
+//       <Navbar user={plainUser} />
+
+//       {user.role === "user" ? (
+//         <UserDashboard />
+//       ) : (
+//         <DevliveryBoy />
+//       )}
+//     </div>
+//   )
+// }
 
 export default Home
 

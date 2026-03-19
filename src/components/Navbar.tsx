@@ -287,8 +287,10 @@ const Navbar = ({ user }: { user?: IUser }) => {
           </>
         )}
       </AnimatePresence>
-
-      <nav
+         {isAdmin ? (
+        <div></div>
+          ) : (
+            <nav
         className="
           w-[95%] fixed top-3 left-1/2 -translate-x-1/2 z-50
           bg-white shadow-lg rounded-2xl
@@ -628,6 +630,8 @@ const Navbar = ({ user }: { user?: IUser }) => {
         </div>
 
       </nav>
+          )}
+      
 
       <div className="h-12 md:h-4" />
     </>
