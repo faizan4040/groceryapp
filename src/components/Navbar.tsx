@@ -322,7 +322,10 @@ const Navbar = ({ user }: { user?: IUser }) => {
             </Link>
 
             {/* Location Dropdown */}
-            <div ref={locationRef} className="relative">
+            {isAdmin ? (
+           <div></div>
+          ) : (
+             <div ref={locationRef} className="relative">
               <button
                 onClick={() => setLocationOpen((p) => !p)}
                 className="flex items-center gap-2 hover:bg-gray-50 px-2 md:px-3 py-1.5 md:py-2 rounded-xl transition cursor-pointer max-w-40 sm:max-w-55 md:max-w-none"
@@ -440,23 +443,25 @@ const Navbar = ({ user }: { user?: IUser }) => {
                 )}
               </AnimatePresence>
             </div>
+          )}
+           
           </div>
 
           {/* ────────── CENTER: Search bar — desktop only ────────── */}
          {isAdmin ? (
         <div></div>
-      ) : (
-        <div className="flex-1 max-w-xl mx-4 hidden md:block">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={17} />
-            <input
-              type="text"
-              placeholder="Search for fruits, vegetables, dairy…"
-              className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 transition"
-            />
-          </div>
-        </div>
-      )}
+          ) : (
+            <div className="flex-1 max-w-xl mx-4 hidden md:block">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={17} />
+                <input
+                  type="text"
+                  placeholder="Search for fruits, vegetables, dairy…"
+                  className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+                />
+              </div>
+            </div>
+          )}
          
           {/* ────────── RIGHT: Role Badge (desktop) + User + Cart ────────── */}
           <div className="flex items-center gap-3 md:gap-4 shrink-0">
@@ -554,28 +559,12 @@ const Navbar = ({ user }: { user?: IUser }) => {
                           </p>
                         </div>
                         <Link
-                          href="/admin/add-grocery"
-                          onClick={() => setOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-green-50 text-gray-700 text-sm transition"
-                        >
-                          <PlusCircle size={16} className="text-green-600" />
-                          Add Grocery
-                        </Link>
-                        <Link
-                          href="/admin/view-grocery"
-                          onClick={() => setOpen(false)}
-                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-green-50 text-gray-700 text-sm transition"
-                        >
-                          <List size={16} className="text-green-600" />
-                          View Grocery
-                        </Link>
-                        <Link
                           href="/admin/manage-orders"
                           onClick={() => setOpen(false)}
                           className="flex items-center gap-3 px-4 py-2.5 hover:bg-green-50 text-gray-700 text-sm transition"
                         >
                           <ClipboardList size={16} className="text-green-600" />
-                          Manage Orders
+                          Setting
                         </Link>
                         <div className="h-px bg-gray-100 mx-3 my-1" />
                       </>
@@ -602,21 +591,27 @@ const Navbar = ({ user }: { user?: IUser }) => {
                         Logout
                       </button>
                     </div>
+                    
                   </motion.div>
                 )}
               </AnimatePresence>
             </div>
 
             {/* Cart */}
-            <button
-              className="relative flex items-center justify-center w-9 h-9 md:w-10 md:h-10 bg-green-600 text-white rounded-full hover:bg-green-700 transition shadow-md"
-              aria-label="Shopping cart"
-            >
-              <ShoppingCart size={19} />
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4.5 h-4.5 min-w-4.5 min-h-4.5 flex items-center justify-center rounded-full shadow leading-none">
-                0
-              </span>
-            </button>
+             {isAdmin ? (
+            <div></div>
+              ) : (
+                <button
+                  className="relative flex items-center justify-center w-9 h-9 md:w-10 md:h-10 bg-green-600 text-white rounded-full hover:bg-green-700 transition shadow-md"
+                  aria-label="Shopping cart"
+                >
+                  <ShoppingCart size={19} />
+                  <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-4.5 h-4.5 min-w-4.5 min-h-4.5 flex items-center justify-center rounded-full shadow leading-none">
+                    0
+                  </span>
+                </button>
+              )}
+
           </div>
         </div>
 

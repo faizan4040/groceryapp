@@ -11,13 +11,12 @@ import {
   Eye,
   EyeOff,
   ArrowLeft,
-  Phone,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { IMAGES } from "../../routes/AllImages";
 import toast from "react-hot-toast";
-import { signIn } from "next-auth/react"
+import { signIn } from "next-auth/react";
 
 type PropType = {
   previousStep: (s: number) => void;
@@ -27,53 +26,49 @@ const RegisterForm = ({ previousStep }: PropType) => {
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
-  const [mobile, setMobile] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
-  e.preventDefault();
+    e.preventDefault();
 
-  if (!name || !email || !password || !mobile) {
-    toast.error("Please fill all fields");
-    return;
-  }
-
-  try {
-    setLoading(true);
-
-    const { data } = await axios.post("/api/auth/register", {
-      name,
-      email,
-      mobile,
-      password,
-    });
-
-    // Check if registration was successful
-    if (data.success) {
-      toast.success(data.message); // "User registered successfully"
-
-      // Clear form
-      setName("");
-      setEmail("");
-      setMobile("");
-      setPassword("");
-
-      setTimeout(() => {
-        window.location.href = "/login";
-      }, 500); 
-    } else {
-      toast.error(data.message || "Registration failed");
+    if (!name || !email || !password) {
+      toast.error("Please fill all fields");
+      return;
     }
 
-  } catch (error: any) {
-    console.log(error);
-    toast.error(error?.response?.data?.message || "Registration failed");
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      setLoading(true);
+
+      const { data } = await axios.post("/api/auth/register", {
+        name,
+        email,
+        password,
+      });
+
+      if (data.success) {
+        toast.success(data.message);
+
+        setName("");
+        setEmail("");
+        setPassword("");
+
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 500);
+      } else {
+        toast.error(data.message || "Registration failed");
+      }
+
+    } catch (error: any) {
+      toast.error(
+        error?.response?.data?.message || "Registration failed"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="flex items-center justify-center min-h-screen w-full px-4 sm:px-6 lg:px-8 py-10 bg-linear-to-br from-green-50 via-white to-green-100 relative">
@@ -95,9 +90,9 @@ const RegisterForm = ({ previousStep }: PropType) => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.6 }}
           className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-green-700 text-center mb-2"
-          >
+        >
           Create Account
-          </motion.h1>
+        </motion.h1>
 
         <p className="text-gray-600 text-center mb-8 flex items-center justify-center gap-1 text-sm sm:text-base">
           Join FreshCart today
@@ -121,7 +116,7 @@ const RegisterForm = ({ previousStep }: PropType) => {
               placeholder="Your Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm sm:text-base text-gray-800 focus:ring-2 focus:ring-green-500 focus:outline-none"
+              className="w-full border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm sm:text-base focus:ring-2 focus:ring-green-500 outline-none"
             />
           </div>
 
@@ -133,20 +128,7 @@ const RegisterForm = ({ previousStep }: PropType) => {
               placeholder="Email Address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm sm:text-base text-gray-800 focus:ring-2 focus:ring-green-500 focus:outline-none"
-            />
-          </div>
-
-          {/* Mobile */}
-         <div className="relative">
-            <Phone className="absolute left-3 top-3.5 w-5 text-gray-400" />
-
-            <input
-              type="tel"
-              placeholder="Mobile Number"
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm sm:text-base text-gray-800 focus:ring-2 focus:ring-green-500 focus:outline-none"
+              className="w-full border border-gray-200 rounded-xl py-3 pl-10 pr-4 text-sm sm:text-base focus:ring-2 focus:ring-green-500 outline-none"
             />
           </div>
 
@@ -159,7 +141,7 @@ const RegisterForm = ({ previousStep }: PropType) => {
               placeholder="Password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl py-3 pl-10 pr-10 text-sm sm:text-base text-gray-800 focus:ring-2 focus:ring-green-500 focus:outline-none"
+              className="w-full border border-gray-200 rounded-xl py-3 pl-10 pr-10 text-sm sm:text-base focus:ring-2 focus:ring-green-500 outline-none"
             />
 
             <div
@@ -176,7 +158,7 @@ const RegisterForm = ({ previousStep }: PropType) => {
             whileTap={{ scale: 0.97 }}
             disabled={loading}
             type="submit"
-            className="bg-green-600 text-white py-3 rounded-xl text-sm sm:text-base font-semibold shadow-md hover:bg-green-700 transition flex items-center justify-center gap-2"
+            className="bg-green-600 text-white py-3 rounded-xl font-semibold shadow-md hover:bg-green-700 transition flex items-center justify-center gap-2"
           >
             {loading ? (
               <>
@@ -188,37 +170,29 @@ const RegisterForm = ({ previousStep }: PropType) => {
             )}
           </motion.button>
 
-          {/* OR Divider */}
+          {/* Divider */}
           <div className="flex items-center gap-3 my-2">
             <div className="flex-1 h-px bg-gray-200"></div>
-            <span className="text-xs sm:text-sm text-gray-400">or</span>
+            <span className="text-xs text-gray-400">or</span>
             <div className="flex-1 h-px bg-gray-200"></div>
           </div>
 
-          {/* Google Button */}
+          {/* Google */}
           <motion.button
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
             type="button"
-            onClick={()=>signIn("google",{callbackUrl:"/"})}
-            className="flex cursor-pointer items-center justify-center gap-3 border border-gray-200 py-3 rounded-xl text-sm sm:text-base font-medium text-gray-700 hover:bg-gray-50 transition"
+            onClick={() => signIn("google", { callbackUrl: "/" })}
+            className="flex items-center justify-center gap-3 border border-gray-200 py-3 rounded-xl font-medium text-gray-700 hover:bg-gray-50 transition"
           >
-            <Image
-              src={IMAGES.Google}
-              alt="google"
-              width={40}
-              height={40}
-            />
+            <Image src={IMAGES.Google} alt="google" width={40} height={40} />
             Continue with Google
           </motion.button>
 
-          {/* Login Link */}
-          <p className="text-center text-xs sm:text-sm text-gray-600 mt-1">
+          {/* Login */}
+          <p className="text-center text-sm text-gray-600">
             Already have an account?{" "}
-            <Link
-              href="/login"
-              className="text-green-600 font-semibold hover:underline"
-            >
+            <Link href="/login" className="text-green-600 font-semibold hover:underline">
               Sign in
             </Link>
           </p>

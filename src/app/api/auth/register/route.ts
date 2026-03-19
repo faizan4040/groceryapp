@@ -9,10 +9,10 @@ export async function POST(req: Request) {
     await connectDB();
 
     const body = await req.json();
-    const { name, email, password, mobile } = body;
+    const { name, email, password } = body;
 
     // validation
-    if (!name || !email || !password || !mobile) {
+    if (!name || !email || !password) {
       return NextResponse.json(
         { message: "All fields are required" },
         { status: 400 }
@@ -25,7 +25,7 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-
+  
     // check user
     const existingUser = await User.findOne({ email });
 
@@ -43,7 +43,6 @@ export async function POST(req: Request) {
     const newUser = await User.create({
       name,
       email,
-      mobile,
       password: hashedPassword,
     });
 
@@ -55,7 +54,6 @@ export async function POST(req: Request) {
           id: newUser._id,
           name: newUser.name,
           email: newUser.email,
-          mobile: newUser.mobile,
         },
       },
       { status: 201 }

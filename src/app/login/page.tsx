@@ -67,7 +67,7 @@ const Login = ({ nextStep }: propType) => {
       const role    = session?.user?.role;
 
      
-      router.replace(role ? (dashboardMap[role] ?? "/") : "/edit-role-mobile");
+      router.replace("/");
 
       setEmail("");
       setPassword("");
