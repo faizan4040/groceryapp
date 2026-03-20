@@ -17,22 +17,27 @@ const grocerySchema = new mongoose.Schema<IGrocery>(
       type: String,
       required: true,
     },
+    
     category: {
       type: String,
-      enum: [
-        "Fruits & Vegetables",
-        "Dairy & Eggs",
-        "Rice, Atta & Grains",
-        "Snacks & Biscuits",
-        "Spices & Masalas",
-        "Beverages & Drinks",
-        "Personal Care",
-        "Household Essentials",
-        "Instant & Packaged Food",
-        "Baby & Pet Care",
-      ],
       required: true,
     },
+    // category: {
+    //   type: String,
+    //   enum: [
+    //     "Fruits & Vegetables",
+    //     "Dairy & Eggs",
+    //     "Rice, Atta & Grains",
+    //     "Snacks & Biscuits",
+    //     "Spices & Masalas",
+    //     "Beverages & Drinks",
+    //     "Personal Care",
+    //     "Household Essentials",
+    //     "Instant & Packaged Food",
+    //     "Baby & Pet Care",
+    //   ],
+    //   required: true,
+    // },
     price: {
       type: Number, 
       required: true,
@@ -40,6 +45,7 @@ const grocerySchema = new mongoose.Schema<IGrocery>(
     unit: {
       type: String,
       required: true,
+      enum:["kg", "g", "liter", "ml", "piece", "pack"]
     },
     file: {
       type: String,

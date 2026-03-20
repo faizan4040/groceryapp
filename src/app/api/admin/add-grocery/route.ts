@@ -23,10 +23,8 @@ export async function POST(req: NextRequest) {
     const category = formData.get("category") as string;
     const unit     = formData.get("unit")     as string;
     const price    = formData.get("price")    as string;
-    const file     = formData.get("file")     as string;
-    const image    = formData.get("image")    as Blob;  
+    const image    = formData.get("image")    as File;  // File extends Blob ✓
 
-    // Validate required fields before uploading
     if (!name || !category || !unit || !price || !image) {
       return NextResponse.json(
         { message: "All fields are required" },
@@ -34,7 +32,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Upload image to Cloudinary
     const imageUrl = await uploadOnCloudinary(image);
 
     if (!imageUrl) {
@@ -44,14 +41,12 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Save to MongoDB
     const grocery = await Grocery.create({
       name,
       category,
       unit,
-      price:  parseFloat(price),   // store as Number, not string
-      file:   file ?? "",
-      image:  imageUrl,
+      price: parseFloat(price),
+      image: imageUrl,
     });
 
     return NextResponse.json(
@@ -67,13 +62,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
-
-
-
-
-
-
-
-
-
