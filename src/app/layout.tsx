@@ -5,6 +5,7 @@ import { Provider } from "@/Provider";
 import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip"; 
+import StoreProvider from "@/redux/StoreProvider";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -23,7 +24,11 @@ export default function RootLayout({
       <body className="w-full min-h-screen bg-green-50 antialiased">
         <Provider>
           <TooltipProvider> 
+            
+            <StoreProvider>
             {children}
+            </StoreProvider>
+
             <Toaster
               position="top-right"
               toastOptions={{

@@ -1,54 +1,51 @@
 import mongoose from "mongoose";
 
-interface IGrocery {
+interface IGroceryDoc {
   name: string;
   category: string;
   price: number;
+  originalPrice?: number;
+  discount?: number;
+  stock: number;
   unit: string;
-  file?: string;
   image: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-const grocerySchema = new mongoose.Schema<IGrocery>(
+const grocerySchema = new mongoose.Schema<IGroceryDoc>(
   {
     name: {
       type: String,
       required: true,
     },
-    
     category: {
       type: String,
       required: true,
     },
-    // category: {
-    //   type: String,
-    //   enum: [
-    //     "Fruits & Vegetables",
-    //     "Dairy & Eggs",
-    //     "Rice, Atta & Grains",
-    //     "Snacks & Biscuits",
-    //     "Spices & Masalas",
-    //     "Beverages & Drinks",
-    //     "Personal Care",
-    //     "Household Essentials",
-    //     "Instant & Packaged Food",
-    //     "Baby & Pet Care",
-    //   ],
-    //   required: true,
-    // },
     price: {
-      type: Number, 
+      type: Number,
       required: true,
+    },
+    originalPrice: {
+      type: Number,
+    },
+    discount: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 100,
+    },
+    stock: {
+      type: Number,
+      required: true,
+      default: 0,
+      min: 0,
     },
     unit: {
       type: String,
       required: true,
-      enum:["kg", "g", "liter", "ml", "piece", "pack"]
-    },
-    file: {
-      type: String,
+      enum: ["kg", "g", "liter", "ml", "piece", "pack"],
     },
     image: {
       type: String,
@@ -56,9 +53,67 @@ const grocerySchema = new mongoose.Schema<IGrocery>(
     },
   },
   {
-    timestamps: true, 
+    timestamps: true,
   }
 );
 
-const Grocery=mongoose.models.Grocery || mongoose.model("Grocery",grocerySchema)
-export default Grocery
+const Grocery =
+  mongoose.models.Grocery ||
+  mongoose.model<IGroceryDoc>("Grocery", grocerySchema);
+
+export default Grocery;
+
+
+
+
+
+
+
+// import mongoose from "mongoose";
+
+// interface IGrocery {
+//   name: string;
+//   category: string;
+//   price: number;
+//   unit: string;
+//   file?: string;
+//   image: string;
+//   createdAt?: Date;
+//   updatedAt?: Date;
+// }
+
+// const grocerySchema = new mongoose.Schema<IGrocery>(
+//   {
+//     name: {
+//       type: String,
+//       required: true,
+//     },
+    
+//     category: {
+//       type: String,
+//       required: true,
+//     },
+//     price: {
+//       type: Number, 
+//       required: true,
+//     },
+//     unit: {
+//       type: String,
+//       required: true,
+//       enum:["kg", "g", "liter", "ml", "piece", "pack"]
+//     },
+//     file: {
+//       type: String,
+//     },
+//     image: {
+//       type: String,
+//       required: true,
+//     },
+//   },
+//   {
+//     timestamps: true, 
+//   }
+// );
+
+// const Grocery=mongoose.models.Grocery || mongoose.model("Grocery",grocerySchema)
+// export default Grocery
