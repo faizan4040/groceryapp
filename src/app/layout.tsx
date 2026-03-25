@@ -6,6 +6,7 @@ import { Geist } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip"; 
 import StoreProvider from "@/redux/StoreProvider";
+import { LoaderProvider } from "@/context/LoaderContext";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -22,6 +23,8 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("font-sans", geist.variable)}>
       <body className="w-full min-h-screen bg-green-50 antialiased">
+        <LoaderProvider>
+          
         <Provider>
           <TooltipProvider> 
             
@@ -57,6 +60,8 @@ export default function RootLayout({
             />
           </TooltipProvider>
         </Provider>
+
+        </LoaderProvider>
       </body>
     </html>
   );
