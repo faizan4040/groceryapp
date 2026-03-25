@@ -2,8 +2,12 @@
 
 import React from "react";
 import { motion } from "motion/react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store";
 
 const Herosection = () => {
+  
+
   return (
     <section className="w-[95%] mx-auto mt-28 relative rounded-3xl overflow-hidden">
 

@@ -1,5 +1,3 @@
-// src/app/(root)/(admin)/admin/layout.tsx
-
 import { AppSidebar, TopBar } from "@/components/admin/app-sidebar"
 import { SidebarProvider } from "@/components/ui/sidebar"
 

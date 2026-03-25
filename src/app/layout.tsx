@@ -26,7 +26,7 @@ export default function RootLayout({
           <TooltipProvider> 
             
             <StoreProvider>
-            {children}
+              {children}
             </StoreProvider>
 
             <Toaster
