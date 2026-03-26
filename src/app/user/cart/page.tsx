@@ -12,6 +12,7 @@ import {
   decreaseQty,
   ICartItem,
 } from '@/redux/cartSlice'
+import { useRouter } from 'next/navigation'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 const fmt = (n: number) =>
@@ -48,7 +49,8 @@ export default function CartPage() {
     }
   }
 
-  // ── Empty state ───────────────────────────────────────────────────────────
+   const router = useRouter()
+
   if (cartData.length === 0) {
     return (
       <div className="min-h-screen bg-[#f5f7f2] flex items-center justify-center px-4">
@@ -78,7 +80,8 @@ export default function CartPage() {
     )
   }
 
-  // ── Main cart ─────────────────────────────────────────────────────────────
+ 
+  
   return (
     <div className="min-h-screen bg-[#f5f7f2]" style={{ fontFamily: "'DM Sans', sans-serif" }}>
       <style>{`
@@ -282,8 +285,8 @@ export default function CartPage() {
           {/* CTA */}
           <motion.button
             whileTap={{ scale: 0.97 }}
-            className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold rounded-2xl text-base shadow-lg shadow-green-200 transition-all"
-          >
+            className="w-full py-4 bg-green-600 cursor-pointer hover:bg-green-700 text-white font-bold rounded-2xl text-base shadow-lg shadow-green-200 transition-all"
+            onClick={() => router.push("/user/checkout")}>
             Proceed to Checkout →
           </motion.button>
 

@@ -8,6 +8,7 @@ import Link from 'next/link'
 import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '@/redux/store'
 import { increaseQty, decreaseQty, removeFromCart, ICartItem } from '@/redux/cartSlice'
+import { useRouter } from 'next/navigation'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 const fmt = (n: number) =>
@@ -20,13 +21,13 @@ const fmt = (n: number) =>
 const DELIVERY_THRESHOLD = 499
 const DELIVERY_FEE = 49
 
-// ─── Props ────────────────────────────────────────────────────────────────────
+
 interface CartSidebarProps {
   open: boolean
   onClose: () => void
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
+
 export default function CartSidebar({ open, onClose }: CartSidebarProps) {
   const dispatch = useDispatch()
   const cartData: ICartItem[] = useSelector((state: RootState) => state.cart.cartData)
@@ -37,6 +38,8 @@ export default function CartSidebar({ open, onClose }: CartSidebarProps) {
   const totalQty = cartData.reduce((s, i) => s + i.quantity, 0)
   const progress = Math.min(100, (subtotal / DELIVERY_THRESHOLD) * 100)
   const remaining = DELIVERY_THRESHOLD - subtotal
+
+  const route = useRouter()
 
   return (
     <AnimatePresence>
@@ -231,7 +234,8 @@ export default function CartSidebar({ open, onClose }: CartSidebarProps) {
                   </Link>
                   <motion.button
                     whileTap={{ scale: 0.97 }}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-bold transition shadow-md shadow-green-200"
+                    className="flex-1 flex items-center cursor-pointer justify-center gap-1.5 py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-bold transition shadow-md shadow-green-200"
+                    onClick={()=>route.push('/user/checkout')}
                   >
                     Checkout <ArrowRight size={15} />
                   </motion.button>
