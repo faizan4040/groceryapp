@@ -118,7 +118,7 @@ export default function CartPage() {
           <div className="flex items-center gap-2 bg-green-50 border border-green-100 rounded-2xl px-4 py-3 mb-3 text-sm text-green-700 font-medium">
             <Truck size={16} />
             {delivery === 0
-              ? <span>🎉 You qualify for <strong>free delivery!</strong></span>
+              ? <span> You qualify for <strong>free delivery!</strong></span>
               : <span>Add {fmt(DELIVERY_THRESHOLD - (subtotal - discount))} more for <strong>free delivery</strong></span>}
           </div>
           <div className="w-full bg-green-100 rounded-full h-1.5 mb-5 overflow-hidden">
@@ -267,7 +267,7 @@ export default function CartPage() {
 
             {savings > 0 && (
               <div className="bg-green-50 border border-green-100 rounded-xl px-3 py-2 text-green-700 text-xs font-semibold flex items-center gap-1.5">
-                🎉 You're saving {fmt(savings)} on this order!
+                 You're saving {fmt(savings)} on this order!
               </div>
             )}
           </div>

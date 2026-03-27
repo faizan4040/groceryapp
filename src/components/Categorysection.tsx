@@ -33,7 +33,7 @@ function CategorySection({ category, items }: CategorySectionProps) {
 
         {/* Left: label */}
         <div className="flex items-center gap-2.5">
-          <div className="w-1 h-5 md:h-6 rounded-full bg-gradient-to-b from-green-400 to-green-600 shrink-0" />
+          <div className="w-1 h-5 md:h-6 rounded-full bg-linear-to-b from-green-400 to-green-600 shrink-0" />
           <h2 className="text-base sm:text-lg md:text-xl font-bold text-gray-800 capitalize tracking-tight">
             {category}
           </h2>
@@ -113,7 +113,7 @@ function CategorySection({ category, items }: CategorySectionProps) {
                     SM:     ~3 cards         →  160px
                     MD+:    fixed widths     →  180px–200px
                   */
-                  className="shrink-0 w-[calc(50%-6px)] sm:w-[160px] md:w-[180px] lg:w-[200px]"
+                  className="shrink-0 w-[calc(50%-6px)] sm:w-40 md:w-45 lg:w-50"
                 >
                   <GroceryItemCard item={item} />
                 </motion.div>
@@ -124,7 +124,7 @@ function CategorySection({ category, items }: CategorySectionProps) {
                 <div
                   onClick={() => setExpanded(true)}
                   style={{ scrollSnapAlign: 'start' }}
-                  className="shrink-0 w-[calc(50%-6px)] sm:w-[160px] md:w-[180px] lg:w-[200px] flex flex-col items-center justify-center gap-2.5 rounded-2xl border-2 border-dashed border-green-200 cursor-pointer hover:border-green-400 hover:bg-green-50/40 active:scale-[0.97] transition-all duration-200 min-h-[220px]"
+                  className="shrink-0 w-[calc(50%-6px)] sm:w-40 md:w-45 lg:w-50 flex flex-col items-center justify-center gap-2.5 rounded-2xl border-2 border-dashed border-green-200 cursor-pointer hover:border-green-400 hover:bg-green-50/40 active:scale-[0.97] transition-all duration-200 min-h-55"
                 >
                   <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center">
                     <ChevronRight size={17} className="text-green-600" />
