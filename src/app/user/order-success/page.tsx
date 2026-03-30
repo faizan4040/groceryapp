@@ -119,14 +119,14 @@ export default function OrderSuccess({
         className="flex gap-3 flex-wrap justify-center"
       >
         <button
-          onClick={() => router.push('/user/orders')}
-          className="px-6 py-3 border-2 border-emerald-600 text-emerald-600 rounded-2xl font-semibold hover:bg-emerald-50 transition-all flex items-center gap-2"
+          onClick={() => router.push('/user/my-orders')}
+          className="px-6 py-3 border-2 cursor-pointer border-emerald-600 text-emerald-600 rounded-2xl font-semibold hover:bg-emerald-50 transition-all flex items-center gap-2"
         >
-          <FaTruck /> Track Order
+          <FaTruck /> My Orders
         </button>
         <button
           onClick={() => router.push('/')}
-          className="px-6 py-3 bg-emerald-600 text-white rounded-2xl font-semibold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200 flex items-center gap-2"
+          className="px-6 py-3 bg-emerald-600 cursor-pointer text-white rounded-2xl font-semibold hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-200 flex items-center gap-2"
         >
           <FaShoppingBag /> Shop More
         </button>

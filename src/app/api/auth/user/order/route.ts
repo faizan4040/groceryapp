@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     const body = await req.json();
-    console.log("🟡 ORDER PAYLOAD:", body);
+    console.log(" ORDER PAYLOAD:", body);
 
     const { userId, items, paymentMethod, totalAmount, address } = body;
 
@@ -92,7 +92,7 @@ export async function POST(req: NextRequest) {
         isPaid: false,
       });
 
-      console.log("✅ COD ORDER CREATED:", order._id);
+      console.log("COD ORDER CREATED:", order._id);
 
       return NextResponse.json({
         success: true,
@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
       isPaid: false,
     });
 
-    console.log("✅ ONLINE ORDER CREATED:", order._id);
+    console.log(" ONLINE ORDER CREATED:", order._id);
 
     return NextResponse.json({
       success: true,
@@ -144,7 +144,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error("🔴 ORDER ERROR:", error.message);
+    console.error(" ORDER ERROR:", error.message);
 
     return NextResponse.json(
       {
@@ -155,126 +155,3 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
-
-
-
-// import connectDB from "@/lib/db";
-// import Order from "@/models/order.model";
-// import User from "@/models/user.models";
-// import { NextRequest, NextResponse } from "next/server";
-
-// // Must be named POST (uppercase) for Next.js App Router
-// export async function POST(req: NextRequest) {
-//   try {
-//     await connectDB();
-
-//     const { userId, items, paymentMethod, totalAmount, address } = await req.json();
-
-//     // Validate required fields
-//     if (!items || !userId || !paymentMethod || !totalAmount || !address) {
-//       return NextResponse.json(
-//         { message: "Please send all required fields: userId, items, paymentMethod, totalAmount, address" },
-//         { status: 400 }
-//       );
-//     }
-
-//     // Validate user exists
-//     const user = await User.findById(userId);
-//     if (!user) {
-//       return NextResponse.json(
-//         { message: "User not found" },
-//         { status: 404 }
-//       );
-//     }
-
-//     // Validate address required fields
-//     if (!address.fullName || !address.mobile || !address.fullAddress) {
-//       return NextResponse.json(
-//         { message: "Address must include fullName, mobile, and fullAddress" },
-//         { status: 400 }
-//       );
-//     }
-
-//     // Validate paymentMethod matches model enum
-//     if (!["cod", "online"].includes(paymentMethod)) {
-//       return NextResponse.json(
-//         { message: "paymentMethod must be 'cod' or 'online'" },
-//         { status: 400 }
-//       );
-//     }
-
-//     // Create the order
-//     const newOrder = await Order.create({
-//       user: userId,
-//       items,
-//       paymentMethod,
-//       totalAmount,
-//       address,
-//     });
-
-//     return NextResponse.json(
-//       { message: "Order placed successfully", order: newOrder },
-//       { status: 201 }
-//     );
-
-//   } catch (error: any) {
-//     console.error("Place order error:", error);
-//     return NextResponse.json(
-//       { message: `Place order error: ${error?.message || error}` },
-//       { status: 500 }
-//     );
-//   }
-// }
-
-
-
-
-
-
-
-// import connectDB from "@/lib/db";
-// import Order from "@/models/order.model";
-// import User from "@/models/user.models";
-// import { connect } from "http2";
-// import { NextRequest, NextResponse } from "next/server";
-
-
-// export async function post(req:NextRequest){
-//     try{
-//         await connectDB()
-//         const {userId, items, paymentMethod, totalAmount,address} = await req.json()
-//            if(!items || !userId || !paymentMethod || !totalAmount || !address){
-//               return NextResponse.json(
-//                 {message:"please send all credentials"},
-//                 {status:400}
-//             )
-//         }
-//         const user = await User.findById(userId)
-//         if(!user){
-//             return NextResponse.json(
-//                 {message:"user not found"},
-//                 {status:400}
-//             )
-//         }
-
-//         const newOrder = await Order.create({
-//              user: userId,
-//              items,
-//              paymentMethod,
-//              totalAmount,
-//              address
-//         })
-//         return NextResponse.json(
-//             newOrder,
-//             { status: 201 }
-//         )
-
-//     } catch(error){
-//      return NextResponse.json(
-//          {message:`place order error ${error}`},
-//          {status:500}
-//      )   
-
-//     }
-// }

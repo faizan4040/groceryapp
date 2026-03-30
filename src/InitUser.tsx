@@ -1,8 +1,9 @@
+'use client'           
+
 import React from 'react'
 import useGetMe from './hooks/useGetMe'
 
-function InitUser(){
-
+function InitUser() {
     useGetMe()
     return null
 }
