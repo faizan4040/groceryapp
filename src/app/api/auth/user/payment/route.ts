@@ -10,13 +10,13 @@ export async function POST(req: NextRequest) {
     await connectDB();
 
     const body = await req.json();
-    console.log("🟡 ORDER PAYLOAD RECEIVED:", JSON.stringify(body, null, 2));
+    console.log(" ORDER PAYLOAD RECEIVED:", JSON.stringify(body, null, 2));
 
     const { userId, items, paymentMethod, totalAmount, address } = body;
 
     // ── Detailed validation with specific error messages ──
     if (!userId) {
-      console.error("❌ userId is missing or falsy:", userId);
+      console.error(" userId is missing or falsy:", userId);
       return NextResponse.json(
         { success: false, message: "userId is missing" },
         { status: 400 }
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!mongoose.Types.ObjectId.isValid(String(userId))) {
-      console.error("❌ Invalid userId format:", userId);
+      console.error(" Invalid userId format:", userId);
       return NextResponse.json(
         { success: false, message: "Invalid userId format" },
         { status: 400 }
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     // ── User check ──
     const user = await User.findById(userId);
     if (!user) {
-      console.error("❌ No user found for id:", userId);
+      console.error(" No user found for id:", userId);
       return NextResponse.json(
         { success: false, message: "User not found" },
         { status: 404 }
@@ -148,7 +148,7 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error("🔴 ORDER ERROR:", error.message);
+    console.error(" ORDER ERROR:", error.message);
     return NextResponse.json(
       { success: false, message: error.message || "Internal Server Error" },
       { status: 500 }

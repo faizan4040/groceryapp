@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
-    // 🔐 Check admin
+    // Check admin
     const session = await auth();
     if (session?.user?.role !== "admin") {
       return NextResponse.json(
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // 📦 Get form data
+    // Get form data
     const formData = await req.formData();
 
     const name     = formData.get("name") as string;
@@ -25,14 +25,14 @@ export async function POST(req: NextRequest) {
     const unit     = formData.get("unit") as string;
     const price    = formData.get("price") as string;
     const stock    = formData.get("stock") as string;
-    const discount = formData.get("discount") as string | null; // ✅ NEW
+    const discount = formData.get("discount") as string | null; 
     const image    = formData.get("image") as File;
 
     console.log("FORM DATA:", {
       name, category, unit, price, stock, discount, image
     });
 
-    // ❗ Validation
+    // Validation
     if (!name || !category || !unit || !price || !stock || !image) {
       return NextResponse.json(
         { message: "All fields are required" },
@@ -47,18 +47,18 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ☁️ Upload image
+    // Upload image
     const imageUrl = await uploadOnCloudinary(image);
     if (!imageUrl) {
       throw new Error("Cloudinary upload failed");
     }
 
-    // 💰 Price logic
+    // Price logic
     const basePrice = Number(price);
     const parsedStock = Number(stock);
     const parsedDiscount = discount ? Number(discount) : 0;
 
-    // ❗ Validate numbers
+    // Validate numbers
     if (isNaN(basePrice) || isNaN(parsedStock)) {
       return NextResponse.json(
         { message: "Invalid price or stock" },
@@ -73,24 +73,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ✅ Final price (after discount)
+    //  Final price (after discount)
     const finalPrice =
       parsedDiscount > 0
         ? parseFloat((basePrice * (1 - parsedDiscount / 100)).toFixed(2))
         : basePrice;
 
-    // ✅ Original price (for UI cut)
+    //  Original price (for UI cut)
     const originalPrice =
       parsedDiscount > 0 ? basePrice : null;
 
-    // 🧾 Create grocery
+    //  Create grocery
     const grocery = await Grocery.create({
       name,
       category,
       unit,
-      price: finalPrice,        // 👈 user sees this
-      originalPrice,            // 👈 cut price
-      discount: parsedDiscount, // 👈 badge
+      price: finalPrice,        // user sees this
+      originalPrice,            // cut price
+      discount: parsedDiscount, // badge
       stock: parsedStock,
       image: imageUrl,
     });

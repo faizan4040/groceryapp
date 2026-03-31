@@ -7,7 +7,8 @@ import {
         ADMIN_CATEGORY_SHOW,
         ADMIN_DASHBOARD, 
         ADMIN_GROCERY_ADD, 
-        ADMIN_GROCERY_SHOW, 
+        ADMIN_GROCERY_SHOW,
+        ADMIN_MANAGEORDERS_SHOW, 
      } from "../../routes/AdminPanelRoute";
 
 
@@ -60,7 +61,7 @@ export const adminSidebarMenu = [
     submenu: [
       {
         title: "Manage Orders",
-        url: "/admin/orders",
+        url: ADMIN_MANAGEORDERS_SHOW,
       },
     ],
   },

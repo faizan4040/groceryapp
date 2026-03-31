@@ -84,7 +84,7 @@ export async function POST(req: NextRequest) {
 
     if (paymentMethod === "cod") {
       const order = await Order.create({
-        user: userId,
+        userId: new mongoose.Types.ObjectId(userId),
         items: validatedItems,
         paymentMethod: "cod",
         totalAmount: parsedTotal,
@@ -122,14 +122,14 @@ export async function POST(req: NextRequest) {
     });
 
     const order = await Order.create({
-      user: userId,
-      items: validatedItems,
-      paymentMethod: "online",
-      totalAmount: parsedTotal,
-      address,
-      razorpayOrderId: razorpayOrder.id,
-      isPaid: false,
-    });
+    userId: new mongoose.Types.ObjectId(userId), 
+    items: validatedItems,
+    paymentMethod: "online",
+    totalAmount: parsedTotal,
+    address,
+    razorpayOrderId: razorpayOrder.id,
+    isPaid: false,
+  });
 
     console.log(" ONLINE ORDER CREATED:", order._id);
 
