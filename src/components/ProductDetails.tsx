@@ -51,6 +51,7 @@ export default function ProductDetailClient({ product }: { product: IGrocery }) 
       name: product.name,
       price,
       image: product.image,
+      unit: product.unit || '',
       quantity: 1,
     }))
   }
