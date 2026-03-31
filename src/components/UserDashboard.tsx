@@ -31,7 +31,7 @@ const UserDashboard = async () => {
 
   // Group by category
   const grouped = groceries.reduce<Record<string, IGrocery[]>>((acc, item) => {
-    const key = item.category.toLowerCase()
+    const key = (item.category || 'other').toLowerCase()
     if (!acc[key]) acc[key] = []
     acc[key].push(item)
     return acc
