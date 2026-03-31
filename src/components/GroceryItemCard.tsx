@@ -26,7 +26,7 @@ function GroceryItemCard({ item }: { item: IGrocery }) {
   const dispatch = useDispatch<AppDispatch>()
 
   const cartItem = useSelector((state: RootState) =>
-    state.cart.cartData?.find((i) => i._id === item._id)
+   state.cart.cartData?.find((i) => i._id === item._id.toString())
   )
 
   const quantity = cartItem?.quantity || 0
@@ -121,7 +121,7 @@ function GroceryItemCard({ item }: { item: IGrocery }) {
                 <button
                   onClick={(e) => {
                     e.stopPropagation()
-                    dispatch(decreaseQty(item._id))
+                    dispatch(decreaseQty(item._id.toString()))
                   }}
                 >
                   <Minus size={12} />
@@ -138,6 +138,7 @@ function GroceryItemCard({ item }: { item: IGrocery }) {
                       _id: item._id.toString(),
                       name: item.name,
                       price: Number(item.price),
+                      unit: item.unit || '',
                       image: item.image,
                       quantity: 1
                     }))
@@ -164,6 +165,7 @@ function GroceryItemCard({ item }: { item: IGrocery }) {
                     _id: item._id.toString(),
                     name: item.name,
                     price: Number(item.price),
+                    unit: item.unit || '',
                     image: item.image,
                     quantity: 1
                   }))
