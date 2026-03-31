@@ -102,7 +102,7 @@ function CategorySection({ category, items }: CategorySectionProps) {
             >
               {items.map((item, i) => (
                 <motion.div
-                  key={item._id}
+                  key={item._id.toString()}
                   initial={{ opacity: 0, x: 20 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.3, delay: Math.min(i * 0.04, 0.3) }}
@@ -159,7 +159,7 @@ function CategorySection({ category, items }: CategorySectionProps) {
           >
             {items.map((item, i) => (
               <motion.div
-                key={item._id}
+                key={item._id.toString()}
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.25, delay: Math.min(i * 0.025, 0.25) }}
