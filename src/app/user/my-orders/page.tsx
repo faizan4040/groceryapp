@@ -7,18 +7,26 @@ import { ArrowLeft, ShoppingBag } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import { FiCheckCircle } from 'react-icons/fi'
+import { FaCartShopping } from "react-icons/fa6";
+import { GiConfirmed } from "react-icons/gi";
+import { FcShipped } from "react-icons/fc";
+import { FaRoute } from "react-icons/fa";
+import { CiDeliveryTruck } from "react-icons/ci";
+
+
 
 /* ─── STATUS STEPS ─── */
 const JOURNEY_STEPS = [
-  { key: 'pending', label: 'Placed', icon: '🛒' },
-  { key: 'confirmed', label: 'Confirmed', icon: '✅' },
-  { key: 'shipped', label: 'Shipped', icon: '📦' },
-  { key: 'out for delivery', label: 'Out for Delivery', icon: '🚚' },
-  { key: 'delivered', label: 'Delivered', icon: '🎉' },
+  { key: 'pending', label: 'Placed', icon: <FaCartShopping /> },
+  { key: 'confirmed', label: 'Confirmed', icon: <GiConfirmed /> },
+  { key: 'shipped', label: 'Shipped', icon: <FcShipped /> },
+  { key: 'out for delivery', label: 'Out for Delivery', icon: <FaRoute /> },
+  { key: 'delivered', label: 'Delivered', icon: <CiDeliveryTruck /> },
 ]
 
+
 /* ─── LIVE STATUS TRACKER ─── */
-const OrderStatusTracker = ({ status }: { status: string }) => {
+  const OrderStatusTracker = ({ status }: { status: string }) => {
   const isCancelled = status === 'cancelled'
   const currentIdx = JOURNEY_STEPS.findIndex(s => s.key === status)
 

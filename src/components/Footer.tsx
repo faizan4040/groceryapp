@@ -6,7 +6,13 @@ import { SiVisa, SiMastercard, SiPaypal, SiApplepay } from "react-icons/si";
 import { motion } from "motion/react";
 import Link from "next/link";
 
-const company = ["About Us", "Our Farmers", "Sustainability", "Careers", "Blog"];
+const company = [
+  { name: "About Us", href: "/aboutus" },
+  { name: "Our Farmers", href: "/farmers" },
+  { name: "Sustainability", href: "/sustainability" },
+  { name: "Careers", href: "/careers" },
+  { name: "Blog", href: "/blog" }, 
+];
 const service = ["Contact Us", "Shipping Policy", "Refund & Returns", "FAQs", "Store Locator"];
 
 const socials = [
@@ -107,13 +113,15 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3">
               {company.map((item) => (
-                <li key={item}>
+                <li key={item.name}>
                   <Link
-                    href="#"
+                    href={item.href}
                     className="group inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-emerald-300 transition-colors"
                   >
-                    <span className="w-0 group-hover:w-3 overflow-hidden transition-all duration-200 text-emerald-400 text-xs">→</span>
-                    {item}
+                    <span className="w-0 group-hover:w-3 overflow-hidden transition-all duration-200 text-emerald-400 text-xs">
+                      →
+                    </span>
+                    {item.name}
                   </Link>
                 </li>
               ))}
