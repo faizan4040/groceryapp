@@ -1,18 +1,3 @@
-// import React from 'react'
-
-// const AdminDashboard = () => {
-//   return (
-//     <div>
-      
-//     </div>
-//   )
-// }
-
-// export default AdminDashboard
-
-
-
-
 "use client";
 
 import { AppSidebar } from "@/components/admin/app-sidebar";

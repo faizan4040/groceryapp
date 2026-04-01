@@ -6,14 +6,15 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
 
 const categories = [
-  { name: "Vegetables", image: "/categories/vegetables.jpg",},
-  { name: "Fruits",     image: "/categories/fruits.jpg", },
-  { name: "Dairy",      image: "/categories/dairy.jpg", },
-  { name: "Bakery",     image: "/categories/bakery.jpg", },
-  { name: "Meat & Fish",image: "/categories/fruits.jpg",},
-  { name: "Beverages",  image: "/categories/vegetables.jpg",},
-  { name: "Snacks",     image: "/categories/vegetables.jpg",},
-  { name: "Organic",    image: "/categories/organic.jpg",},
+  { name: "Masala", image: "/categories/masalas.webp",},
+  { name: "Cold Drinks & Juices",   image: "/categories/coldrings.webp",},
+  { name: "Cleaning & Essentials",     image: "/categories/cleaning.jpg", },
+  { name: "Rice, Atta & Dall",      image: "/categories/rice_atta_dall.webp", },
+  { name: "souces & spreads ",     image: "/categories/souces.jpg", },
+  { name: "Stationary",image: "/categories/stationary.png",},
+  { name: "Personal_Care",  image: "/categories/personal_care.jpg",},
+  { name: "Snacks & Munchies",     image: "/categories/snacks_munchies.webp",},
+  { name: "Food Oil",    image: "/categories/food_oil.webp",},
 ];
 
 const Category = () => {
@@ -62,16 +63,14 @@ const Category = () => {
           {categories.map((cat, i) => (
             <motion.div
               key={i}
-              /* FIX 1 – perspective needed for rotateX/Y to look correct */
               style={{ perspective: 600 }}
               whileHover={{ rotateX: 6, rotateY: -6, scale: 1.05 }}
               transition={{ type: "spring", stiffness: 220, damping: 18 }}
               className="min-w-40 bg-white rounded-2xl shadow-md p-5 flex flex-col items-center justify-center cursor-pointer hover:shadow-xl hover:shadow-green-100 transition-shadow"
             >
-              {/* FIX 2 – next/image with priority on first 4 + fallback emoji */}
               <div className="w-24 h-24 flex items-center justify-center bg-green-50 rounded-full mb-3 overflow-hidden relative">
                 {imgErrors[i] ? (
-                  /* Fallback when image is missing / broken */
+
                   <span className="text-4xl select-none"></span>
                 ) : (
                   <Image
@@ -79,7 +78,7 @@ const Category = () => {
                     alt={cat.name}
                     fill
                     sizes="96px"
-                    /* FIX 3 – eager-load first 4 cards, lazy the rest */
+                   
                     loading={i < 4 ? "eager" : "lazy"}
                     priority={i < 4}
                     className="object-cover rounded-full"

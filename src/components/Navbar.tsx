@@ -339,7 +339,7 @@ useEffect(() => {
               <div ref={dropdownRef} className="relative">
                 <button
                   onClick={() => setOpen((p) => !p)}
-                  className="flex items-center justify-center w-9 h-9 md:w-10 md:h-10 bg-red-500 rounded-full text-white hover:bg-red-600 transition shadow-sm overflow-hidden"
+                  className="flex items-center cursor-pointer hover:bg-black justify-center w-9 h-9 md:w-10 md:h-10 bg-red-500 rounded-full text-white transition shadow-sm overflow-hidden"
                   aria-label="User menu"
                 >
                   {user?.image
@@ -390,7 +390,7 @@ useEffect(() => {
                           <Box size={16} /> My Orders
                         </Link>
                         <button
-                          className="flex items-center gap-3 px-4 py-2.5 hover:bg-red-50 text-red-500 text-sm w-full transition"
+                          className="flex cursor-pointer items-center gap-3 px-4 py-2.5 hover:bg-red-50 text-red-500 text-sm w-full transition"
                           onClick={() => { setOpen(false); signOut({ callbackUrl: '/login' }) }}
                         >
                           <LogOut size={16} /> Logout
@@ -404,7 +404,7 @@ useEffect(() => {
               {/* ── Cart Button → opens CartSidebar ── */}
               <button
                 onClick={() => setCartOpen(true)}
-                className="relative flex items-center justify-center w-9 h-9 md:w-10 md:h-10 bg-green-600 text-white rounded-full hover:bg-green-700 transition shadow-md"
+                className="relative flex cursor-pointer hover:bg-green-600 items-center justify-center w-9 h-9 md:w-10 md:h-10 bg-green-600 text-white rounded-full transition shadow-md"
                 aria-label="Open cart"
               >
                 <ShoppingCart size={19} />
