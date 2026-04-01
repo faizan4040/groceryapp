@@ -1,5 +1,6 @@
+export const dynamic = "force-dynamic";
+
 import { auth } from '@/auth'
-import React from 'react'
 import connectDB from '@/lib/db'
 import User from '@/models/user.models'
 import { redirect } from 'next/navigation'
