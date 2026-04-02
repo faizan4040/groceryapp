@@ -59,7 +59,7 @@ const AddressSchema = new Schema<IAddress>({
 }, { _id: false });
 
 const OrderSchema = new Schema<IOrder>({
-  // ── KEY FIX: userId as plain String, indexed for fast lookup ──
+ 
   userId: {
     type:     String,
     required: true,
