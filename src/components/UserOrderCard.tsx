@@ -110,7 +110,7 @@ const UserOrderCard = ({ order }: { order: IOrder }) => {
       initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4 }}
-      className="bg-white rounded-2xl border border-gray-100 shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
+      className="bg-white rounded-2xl border mt-6 border-gray-100 shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden"
     >
 
       {/* ── Header ── */}

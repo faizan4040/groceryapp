@@ -13,10 +13,10 @@ function useGetMe() {
     const getMe = async () => {
       try {
         const result = await axios.get("/api/me")
-        console.log("🟢 /api/me response:", result.data) // ← remove after testing
+        console.log(" /api/me response:", result.data) // ← remove after testing
         dispatch(setUserData(result.data))               // result.data IS the user object
       } catch (error: any) {
-        console.error("❌ useGetMe failed:", error?.response?.data || error)
+        console.error(" useGetMe failed:", error?.response?.data || error)
         dispatch(setUserData(null))
       }
     }

@@ -5,7 +5,7 @@ import BlogCard from "@/components/BlogCard";
 import { blogs } from "@/app/data/blogs";
 import { motion, AnimatePresence } from "motion/react";
 import Image from "next/image";
-import blogBanner from "@/constants/images/blog_banner.jpg";
+import blogBanner from "@/constants/images/blog_banner.png";
 
 const categories = [
   "Everything",
@@ -33,13 +33,8 @@ export default function Blog() {
     <div className="bg-[#FAFAF8] min-h-screen font-sans">
 
       {/* ─── HERO BANNER ─────────────────────────────────── */}
-      <div className="relative h-[70vh] md:h-[80vh] overflow-hidden">
+      <div className="relative h-[70vh] md:h-[70vh] overflow-hidden">
 
-        {/*
-          IMAGE FIX: Use Next.js <Image> with quality={100} and sizes for full-width.
-          This avoids the WebP over-compression that causes blurriness.
-          The `priority` prop preloads it so there's no blur-in on load.
-        */}
         <Image
           src={blogBanner}
           alt="Blog Banner"
@@ -54,10 +49,10 @@ export default function Blog() {
         {/* Cinematic gradient overlay — dark bottom, clear top */}
         <div
           className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.08) 40%, rgba(0,0,0,0.72) 100%)",
-          }}
+          // style={{
+          //   background:
+          //     "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.08) 40%, rgba(0,0,0,0.72) 100%)",
+          // }}
         />
 
         {/* Subtle film-grain texture overlay */}
@@ -155,7 +150,7 @@ export default function Blog() {
                 >
                   <div className="grid md:grid-cols-2">
                     {/* Image — left half */}
-                    <div className="relative h-64 md:h-auto min-h-[320px] overflow-hidden">
+                    <div className="relative h-64 md:h-auto min-h-80 overflow-hidden">
                       <Image
                         src={featuredBlog.image}
                         alt={featuredBlog.title}

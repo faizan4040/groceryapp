@@ -8,12 +8,20 @@ import Link from "next/link";
 
 const company = [
   { name: "About Us", href: "/aboutus" },
-  { name: "Our Farmers", href: "/farmers" },
-  { name: "Sustainability", href: "/sustainability" },
+  { name: "Privacy", href: "/privacy" },
+  { name: "Terms", href: "/terms" },
   { name: "Careers", href: "/careers" },
+  { name: "Seller", href: "/seller" },
   { name: "Blog", href: "/blog" }, 
 ];
-const service = ["Contact Us", "Shipping Policy", "Refund & Returns", "FAQs", "Store Locator"];
+
+const service = [
+   { name: "Contact Us", href: "/contactus" },
+   { name: "Shipping Policy", href: "/shippingpolicy" },
+   { name: "Refund & Returns", href: "/refund" },
+   { name: "FAQs", href: "/faqs" },
+   { name: "Store Locator", href: "/store_locator" },
+];
 
 const socials = [
   { Icon: FaFacebookF,  href: "#", label: "Facebook",  color: "hover:bg-[#1877F2]" },
@@ -78,7 +86,7 @@ export default function Footer() {
             </Link>
 
             <p className="text-gray-400 text-sm leading-relaxed max-w-57.5">
-              Farm-fresh groceries sourced directly from local farmers, delivered to your door with care.
+              Fresh groceries delivered straight to your doorstep with speed, quality, and care. Experience convenience like never before.
             </p>
 
             {/* Badges */}
@@ -136,13 +144,13 @@ export default function Footer() {
             </h3>
             <ul className="space-y-3">
               {service.map((item) => (
-                <li key={item}>
+                <li key={item.name}>
                   <Link
-                    href="#"
+                     href={item.href}
                     className="group inline-flex items-center gap-1.5 text-sm text-gray-400 hover:text-emerald-300 transition-colors"
                   >
                     <span className="w-0 group-hover:w-3 overflow-hidden transition-all duration-200 text-emerald-400 text-xs">→</span>
-                    {item}
+                     {item.name}
                   </Link>
                 </li>
               ))}
@@ -200,14 +208,14 @@ export default function Footer() {
             © {new Date().getFullYear()}{" "}
             <span className="text-gray-400 font-semibold">FreshCart</span>. All rights reserved.
             {" "}·{" "}
-            <Link href="#" className="hover:text-emerald-400 transition-colors">Privacy</Link>
+            <Link href="/privacy" className="hover:text-emerald-400 transition-colors">Privacy</Link>
             {" "}·{" "}
-            <Link href="#" className="hover:text-emerald-400 transition-colors">Terms</Link>
+            <Link href="/terms" className="hover:text-emerald-400 transition-colors">Terms</Link>
           </p>
 
           {/* Payment icons */}
           <div className="flex items-center gap-2 order-1 md:order-2">
-            <span className="text-[10px] text-gray-600 font-medium mr-1 uppercase tracking-wider">We accept</span>
+            <span className="text-[10px] text-green-600 font-medium mr-1 uppercase tracking-wider">We accept</span>
             {payments.map(({ Icon, label }) => (
               <div
                 key={label}

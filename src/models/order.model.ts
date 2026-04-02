@@ -21,13 +21,17 @@ export interface IAddress {
 }
 
 export interface IOrder extends Document {
-  userId:        string;          // ← String, not ObjectId ref
+  userId:        string;          
   items:         IOrderItem[];
   totalAmount:   number;
   address:       IAddress;
   paymentMethod: 'cod' | 'online';
   isPaid:        boolean;
   status:        'pending' | 'confirmed' | 'shipped' | 'out for delivery' | 'delivered' | 'cancelled';
+
+  assignmentDeliveryBoy?: mongoose.Types.ObjectId;
+  assignment?: mongoose.Types.ObjectId
+
   razorpayOrderId?:   string;
   razorpayPaymentId?: string;
   createdAt?:    Date;
@@ -72,6 +76,18 @@ const OrderSchema = new Schema<IOrder>({
     enum:    ['pending', 'confirmed', 'shipped', 'out for delivery', 'delivered', 'cancelled'],
     default: 'pending',
   },
+
+  assignment:{
+     type: mongoose.Schema.Types.ObjectId,
+     ref: "DeliveryAssignemnt",
+     default: null
+  },
+
+  assignmentDeliveryBoy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+  },
+
   razorpayOrderId:   { type: String },
   razorpayPaymentId: { type: String },
 

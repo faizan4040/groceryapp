@@ -3,8 +3,78 @@
 import Image from "next/image";
 import { motion } from "motion/react";
 import { Users, Target, Leaf, Truck } from "lucide-react";
-import blogBanner from "@/constants/images/blog_banner.jpg";
+import blogBanner from "@/constants/images/aboutus_banner.jpg";
 import grocery from "@/constants/images/grocery.jpg";
+import masala from "@/constants/images/masala.jpg";
+import drinks from "@/constants/images/drinks.jpg";
+import cleaning from "@/constants/images/cleaning.jpg";
+import rice from "@/constants/images/rice.jpg";
+import sauces from "@/constants/images/sauces.jpg";
+import stationary from "@/constants/images/stationary.jpg";
+import personal from "@/constants/images/personalCare.jpg";
+import snacks from "@/constants/images/snacks.jpg";
+import oil from "@/constants/images/oil.jpg";
+
+
+// const categories = [
+//   {
+//     title: "Masala",
+//     desc: "Spices & flavor boosters",
+//     image: masala,
+//   },
+//   {
+//     title: "Cold Drinks & Juices",
+//     desc: "Refreshing beverages",
+//     image: "/constants/images/drinks.jpg",
+//   },
+//   {
+//     title: "Cleaning & Essentials",
+//     desc: "Home cleaning products",
+//     image: "/constants/images/cleaning.jpg",
+//   },
+//   {
+//     title: "Rice, Atta & Dal",
+//     desc: "Daily kitchen staples",
+//     image: "/constants/images/rice.jpg",
+//   },
+//   {
+//     title: "Sauces & Spreads",
+//     desc: "Tasty additions",
+//     image: "/constants/images/sauces.jpg",
+//   },
+//   {
+//     title: "Stationary",
+//     desc: "School & office supplies",
+//     image: "/constants/images/stationary.jpg",
+//   },
+//   {
+//     title: "Personal Care",
+//     desc: "Daily self-care products",
+//     image: "/constants/images/personalCare.jpg",
+//   },
+//   {
+//     title: "Snacks & Munchies",
+//     desc: "Quick bites & snacks",
+//     image: "/constants/images/snacks.jpg",
+//   },
+//   {
+//     title: "Food Oil",
+//     desc: "Healthy cooking oils",
+//     image: "/constants/images/oil.jpg",
+//   },
+// ];
+
+const categories = [
+  { title: "Masala", desc: "Spices & flavor boosters", image: masala },
+  { title: "Cold Drinks & Juices", desc: "Refreshing beverages", image: drinks },
+  { title: "Cleaning & Essentials", desc: "Home cleaning products", image: cleaning },
+  { title: "Rice, Atta & Dal", desc: "Daily kitchen staples", image: rice },
+  { title: "Sauces & Spreads", desc: "Tasty additions", image: sauces },
+  { title: "Stationary", desc: "School & office supplies", image: stationary },
+  { title: "Personal Care", desc: "Daily self-care products", image: personal },
+  { title: "Snacks & Munchies", desc: "Quick bites & snacks", image: snacks },
+  { title: "Food Oil", desc: "Healthy cooking oils", image: oil },
+];
 
 
 export default function Aboutus() {
@@ -129,6 +199,59 @@ export default function Aboutus() {
         </div>
       </div>
 
+      <section className="py-16 px-6 bg-white">
+      <div className="max-w-7xl mx-auto">
+
+
+      {/* Heading */}
+      <div className="text-center mb-12">
+        <h2 className="text-3xl md:text-4xl font-bold">
+          Shop by Categories
+        </h2>
+        <p className="text-gray-500 mt-3">
+          Everything you need, delivered in minutes
+        </p>
+      </div>
+
+    {/* Grid */}
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-3 gap-6">
+
+      {categories.map((cat, i) => (
+        <motion.div
+          key={i}
+          whileHover={{ y: -6 }}
+          className="group bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer"
+        >
+
+          {/* IMAGE */}
+          <div className="h-56 overflow-hidden"> 
+            <Image
+              src={cat.image}
+              alt={cat.title}
+              className="w-full h-full object-cover group-hover:scale-110 transition duration-500"
+            />
+          </div> 
+
+          {/* CONTENT */}
+          <div className="p-4 text-center">
+
+            <h3 className="font-semibold text-sm md:text-base">
+              {cat.title}
+            </h3>
+
+            <p className="text-xs text-gray-500 mt-2 line-clamp-2">
+              {cat.desc}
+            </p>
+
+          </div>
+
+        </motion.div>
+      ))}
+
+    </div>
+  </div>
+</section>
+
       {/* STATS SECTION */}
       <div className="py-16 px-6 text-center">
         <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -166,6 +289,9 @@ export default function Aboutus() {
         <a href={'/'}> Start Shopping</a> 
         </button>
       </div>
+
+
+
 
     </div>
   );
