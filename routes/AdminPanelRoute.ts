@@ -14,7 +14,7 @@ export const ADMIN_GROCERY_SHOW = "/admin/grocery/view-grocery";
 
 // Manage-Orders routes
 export const ADMIN_MANAGEORDERS_SHOW = "/admin/manage-orders";
-export const ADMIN_STOCKORDER = "/admin/stock-orders";
+export const ADMIN_STOCKORDER = "/admin/manage-orders/stock-orders";
 
 
 // delivery route
@@ -25,7 +25,7 @@ export const ADMIN_TRACKING = "/admin/delivery/tracking";
 
 // Coupons
 export const ADMIN_COUPONS_ADD = "/admin/coupons";
-export const ADMIN_COUPONS_SHOW = "/admin/all-coupons";
+export const ADMIN_COUPONS_SHOW = "/admin/coupons/all-coupons";
 
 
 // Reviews
@@ -33,7 +33,7 @@ export const ADMIN_REVIEWS_SHOW = "/admin/reviews";
 
 
 // payment
-export const ADMIN_PAYMENT_SHOW = "/admin/payment";
+export const ADMIN_PAYMENT_SHOW = "/admin/payments";
 
 
 export const DELIVERY_DASHBOARD = '/delivery/dashboard'

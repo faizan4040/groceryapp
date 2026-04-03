@@ -1,4 +1,3 @@
-// app/api/admin/get-orders/route.ts
 import { NextRequest, NextResponse } from 'next/server'
 import connectDB from '@/lib/db'
 import Order from '@/models/order.model'

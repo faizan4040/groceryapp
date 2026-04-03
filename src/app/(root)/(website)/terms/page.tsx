@@ -57,7 +57,7 @@ export default function Terms() {
             transition={{ delay: 0.2 }}
             className="max-w-2xl mx-auto text-slate-500 text-lg leading-relaxed"
           >
-            Please read these terms carefully. They govern your legal rights and responsibilities when using the Blinkit Platform.
+            Please read these terms carefully. They govern your legal rights and responsibilities when using the FreshCartit Platform.
           </motion.p>
         </div>
       </div>
@@ -102,7 +102,7 @@ export default function Terms() {
               </div>
               <h3 className="text-green-500 font-bold uppercase tracking-widest text-xs mb-4">Official Entity</h3>
               <p className="text-lg leading-relaxed text-slate-200">
-                <strong>Blink Commerce Private Limited</strong> (formerly Grofers India Private Limited) is incorporated under the Companies Act, 2013.
+                <strong>FreshCart Commerce Private Limited</strong> (formerly Grofers India Private Limited) is incorporated under the Companies Act, 2013.
               </p>
               <div className="mt-6 pt-6 border-t border-slate-800 text-sm text-slate-400">
                 Registered Office: Ground Floor, Tower A, Pioneer Square, Sector 62, Gurugram-122098, Haryana.
@@ -116,7 +116,7 @@ export default function Terms() {
               </h2>
               <div className="prose prose-slate max-w-none text-slate-600 leading-7 space-y-4">
                 <p>
-                  Your access to the <strong>Blinkit Platform</strong> (Site and Mobile Apps) is governed by these Terms and our Privacy Policy. By undertaking any sale-purchase transaction, you agree to be bound by these Terms.
+                  Your access to the <strong>FreshCart Platform</strong> (Site and Mobile Apps) is governed by these Terms and our Privacy Policy. By undertaking any sale-purchase transaction, you agree to be bound by these Terms.
                 </p>
                 <div className="bg-white border-l-4 border-green-400 p-6 rounded-r-2xl shadow-sm italic">
                   "If you do not accept these terms, you may not access the platform or use our services."
@@ -133,13 +133,13 @@ export default function Terms() {
                 <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
                   <h4 className="font-bold text-slate-900 mb-3 text-lg">The Platform</h4>
                   <p className="text-slate-600 text-sm leading-relaxed">
-                    Blinkit acts as a marketplace facilitating transactions between consumers and Third-Party Sellers. We do not control quality or fitness for Third-Party Offerings.
+                    FreshCartit acts as a marketplace facilitating transactions between consumers and Third-Party Sellers. We do not control quality or fitness for Third-Party Offerings.
                   </p>
                 </div>
                 <div className="bg-white p-8 rounded-3xl border border-slate-200 shadow-sm">
                   <h4 className="font-bold text-slate-900 mb-3 text-lg">Disclaimers</h4>
                   <p className="text-slate-600 text-sm leading-relaxed">
-                    Blinkit is not a party to the bipartite arrangement between you and third-party sellers. We disclaim all warranties associated with third-party offerings.
+                    FreshCartit is not a party to the bipartite arrangement between you and third-party sellers. We disclaim all warranties associated with third-party offerings.
                   </p>
                 </div>
               </div>
@@ -174,7 +174,7 @@ export default function Terms() {
                   <Truck /> Delivery Partners
                 </h2>
                 <p className="font-medium text-lg leading-relaxed mb-6">
-                  Delivery is facilitated through independent contractors. They are neither employees nor agents of Blinkit.
+                  Delivery is facilitated through independent contractors. They are neither employees nor agents of FreshCartit.
                 </p>
                 <div className="bg-black/5 p-6 rounded-2xl border border-black/10">
                   <h4 className="font-bold mb-2">Code of Conduct</h4>
@@ -209,10 +209,10 @@ export default function Terms() {
               <h2 className="text-2xl font-black mb-2">Need Clarification?</h2>
               <p className="text-slate-500 mb-8">For any queries regarding these Terms, please contact our support team.</p>
               <a 
-                href="mailto:info@blinkit.com" 
+                href="mailto:info@FreshCartit.com" 
                 className="inline-flex items-center gap-3 px-10 py-4 bg-slate-900 text-white rounded-full font-bold hover:bg-slate-800 transition-all shadow-lg"
               >
-                info@blinkit.com
+                info@FreshCart.com
               </a>
             </div>
 
@@ -223,7 +223,7 @@ export default function Terms() {
       {/* --- FOOTER --- */}
       <footer className="bg-slate-50 border-t border-slate-200 py-12">
         <div className="max-w-7xl mx-auto px-6 text-center">
-          <p className="text-xs text-slate-400 font-bold tracking-widest uppercase mb-4">Blink Commerce Private Limited</p>
+          <p className="text-xs text-slate-400 font-bold tracking-widest uppercase mb-4">FreshCart Commerce Private Limited</p>
           <div className="flex flex-wrap justify-center gap-x-8 gap-y-2 text-sm text-slate-500 font-medium">
              <a href="#" className="hover:text-green-600">Privacy Policy</a>
              <a href="#" className="hover:text-green-600">Cookie Policy</a>

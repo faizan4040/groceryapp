@@ -21,6 +21,7 @@ import {
         ADMIN_MANAGEORDERS_SHOW,
         ADMIN_PAYMENT_SHOW,
         ADMIN_REVIEWS_SHOW,
+        ADMIN_STOCKORDER,
         ADMIN_TRACKING, 
      } from "../../routes/AdminPanelRoute";
 
@@ -78,7 +79,7 @@ export const adminSidebarMenu = [
       },
       {
         title: "Stock Orders",
-        url: ADMIN_MANAGEORDERS_SHOW,
+        url: ADMIN_STOCKORDER,
       },
     ],
   },

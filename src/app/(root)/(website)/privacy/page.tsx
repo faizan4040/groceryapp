@@ -1,11 +1,9 @@
 'use client'
 
-import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'motion/react';
+import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import { 
   ShieldCheck, 
-  ChevronRight, 
-  Search, 
   Lock, 
   Eye, 
   UserCheck, 
@@ -18,7 +16,7 @@ import {
   Share2
 } from 'lucide-react';
 
-export default function BlinkitPrivacy() {
+export default function FreshCartitPrivacy() {
   const [activeSection, setActiveSection] = useState('intro');
 
   const sections = [
@@ -35,24 +33,24 @@ export default function BlinkitPrivacy() {
     <div className="min-h-screen bg-[#F7F9FB] text-slate-900 font-sans selection:bg-green-200">
       
       {/* HEADER / HERO */}
-      {/* <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
+      <header className="bg-white border-b border-slate-200 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-[#FFD337] rounded-xl flex items-center justify-center shadow-sm">
+            <div className="w-10 h-10 bg-green-500 rounded-xl flex items-center justify-center shadow-sm">
               <ShieldCheck className="text-black w-6 h-6" />
             </div>
-            <span className="text-xl font-bold tracking-tight text-slate-900">Blinkit <span className="text-slate-400 font-medium">Privacy</span></span>
+            <span className="text-xl font-bold tracking-tight text-slate-900">FreshCart <span className="text-slate-400 font-medium">Privacy</span></span>
           </div>
           <div className="hidden md:flex items-center gap-6">
             <span className="flex items-center gap-2 text-sm font-medium text-slate-500">
               <Clock className="w-4 h-4" /> Last Updated: Jan 2025
             </span>
-            <a href="mailto:privacy@blinkit.com" className="bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-slate-800 transition-all">
+            <a href="mailto:privacy@FreshCartit.com" className="bg-slate-900 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-slate-800 transition-all">
               Contact DPO
             </a>
           </div>
         </div>
-      </header> */}
+      </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24">
         <div className="flex flex-col lg:flex-row gap-12">
@@ -98,7 +96,7 @@ export default function BlinkitPrivacy() {
                   Protecting your privacy is our priority.
                 </h1>
                 <p className="text-lg text-slate-600 leading-relaxed max-w-3xl">
-                  We i.e. <strong>"Blink Commerce Private Limited"</strong> (formerly known as Grofers India Private Limited) (“Company”), are committed to protecting the privacy and security of your personal information. Your privacy is important to us and maintaining your trust is paramount.
+                  We i.e. <strong>"FreshCart Commerce Private Limited"</strong> (formerly known as Grofers India Private Limited) (“Company”), are committed to protecting the privacy and security of your personal information. Your privacy is important to us and maintaining your trust is paramount.
                 </p>
                 <div className="mt-8 flex flex-wrap gap-4">
                   <div className="bg-slate-50 border border-slate-100 px-4 py-2 rounded-lg text-sm text-slate-500">
@@ -118,7 +116,7 @@ export default function BlinkitPrivacy() {
                 <div className="bg-white p-8 rounded-3xl border border-slate-200">
                   <h3 className="font-bold mb-3 text-slate-900">What it Covers</h3>
                   <p className="text-slate-600 text-sm leading-relaxed">
-                    Applies to all information Blinkit collects through its Services, emails, texts, and other electronic communications. It specifically covers our website, app, and platform.
+                    Applies to all information FreshCartit collects through its Services, emails, texts, and other electronic communications. It specifically covers our website, app, and platform.
                   </p>
                 </div>
                 <div className="bg-slate-900 p-8 rounded-3xl text-white">
@@ -259,15 +257,15 @@ export default function BlinkitPrivacy() {
           <h2 className="text-2xl font-bold mb-4">Need Clarification?</h2>
           <p className="text-slate-500 mb-8">Our Data Protection Officer (DPO) is available to answer any questions regarding your data privacy.</p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <a href="mailto:privacy@blinkit.com" className="flex items-center justify-center gap-3 bg-slate-100 px-8 py-4 rounded-2xl font-bold hover:bg-[#FFD337] transition-all">
-              <Mail className="w-5 h-5" /> privacy@blinkit.com
+            <a href="mailto:privacy@FreshCartit.com" className="flex items-center justify-center gap-3 bg-slate-100 px-8 py-4 rounded-2xl font-bold hover:bg-[#FFD337] transition-all">
+              <Mail className="w-5 h-5" /> privacy@FreshCartit.com
             </a>
             <div className="flex items-center justify-center gap-3 bg-slate-100 px-8 py-4 rounded-2xl font-bold">
               <Smartphone className="w-5 h-5" /> 011-40592373
             </div>
           </div>
           <p className="mt-12 text-xs text-slate-400 leading-relaxed">
-            Blink Commerce Private Limited<br />
+            FreshCart Commerce Private Limited<br />
             Ground Floor, Pioneer Square, Sector 62, Gurugram, Haryana - 122098
           </p>
         </div>

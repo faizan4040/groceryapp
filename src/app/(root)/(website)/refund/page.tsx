@@ -42,7 +42,7 @@ const RefundAndReturn = () => {
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 pb-20">
       
       {/* --- HERO SECTION --- */}
-      <section className="bg-white pt-24 pb-16 px-6 border-b border-slate-200">
+      <section className="bg-green-200 pt-24 pb-16 px-6 border-b border-slate-200">
         <div className="max-w-4xl mx-auto text-center">
           <motion.div 
             initial={{ scale: 0.9, opacity: 0 }}
@@ -121,7 +121,7 @@ const RefundAndReturn = () => {
           
           <div className="space-y-6 relative z-10">
             {[
-              { method: "Wallet / UPI", time: "Instant (within 5-10 mins)" },
+              { method: "Wallet / UPI", time: "Instant (within 20–24 hours)" },
               { method: "Debit / Credit Card", time: "3 - 5 Business Days" },
               { method: "Net Banking", time: "Up to 7 Business Days" }
             ].map((item, idx) => (
@@ -159,11 +159,11 @@ const RefundAndReturn = () => {
       <footer className="mt-24 border-t border-slate-200 pt-12 px-6">
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-6 opacity-50">
           <div className="text-2xl font-black italic tracking-tighter">freshcart</div>
-          <p className="text-[10px] font-bold uppercase tracking-[0.2em]">Blink Commerce Private Limited © 2026</p>
+          <p className="text-[10px] font-bold uppercase tracking-[0.2em]">FreshCart Commerce Private Limited © 2026</p>
           <div className="flex gap-6 text-[10px] font-bold uppercase tracking-widest">
-            <a href="#">Privacy</a>
-            <a href="#">Terms</a>
-            <a href="#">Security</a>
+            <a href="/privacy">Privacy</a>
+            <a href="/terms">Terms</a>
+            <a href="/aboutus">Security</a>
           </div>
         </div>
       </footer>

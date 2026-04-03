@@ -51,8 +51,8 @@ const Seller = () => {
             <p className="text-lg text-slate-600 mb-8 max-w-md font-medium">
               Offer customers the delight of your products and the convenience of doorstep deliveries. Sign up and start selling!
             </p>
-            <button className="bg-green-400 text-black px-8 py-4 rounded-xl font-black text-lg shadow-xl shadow-green-100 hover:scale-105 transition-transform">
-              Sell on FreshCart
+            <button className="bg-green-400 cursor-pointer hover:bg-black hover:text-white transition-all duration-300 text-black px-8 py-4 rounded-xl font-black text-lg shadow-xl shadow-green-100 hover:scale-105">
+              <a href='/'>Sell on FreshCart</a>
             </button>
           </motion.div>
           <div
@@ -145,11 +145,19 @@ const Seller = () => {
           </div>
 
           <div className="bg-white p-10 rounded-[3rem] shadow-sm">
-            <h3 className="text-xl font-black mb-6 text-green-600">Cities we currently serve:</h3>
-            <p className="text-slate-500 text-sm leading-relaxed tracking-wide">
-              Delhi, Gurugram, Kolkata, Lucknow, Mumbai, Bengaluru, Ahmedabad, Noida, Ghaziabad, Faridabad, Hyderabad, Jaipur, Pune, Chennai, Chandigarh, Ludhiana, Vadodara, Meerut, Kanpur, Panchkula, Kharar, Amritsar, Bhopal, Indore, Zirakpur, Jalandhar, Dehradun, Agra, Mohali, Goa, Patiala, Sonipat, Bhiwadi, Kota, Rohtak, Bahadurgarh, Haridwar, Bathinda, Kochi, Jodhpur and Jammu.
-            </p>
-          </div>
+          <h3 className="text-xl font-black mb-6 text-green-600">
+            Areas we currently serve in Jaipur:
+          </h3>
+
+          <p className="text-slate-500 text-sm leading-relaxed tracking-wide">
+            Vaishali Nagar, Mansarovar, Malviya Nagar, Jagatpura, Sanganer, Tonk Road, 
+            Raja Park, Adarsh Nagar, Bapu Nagar, C-Scheme, Civil Lines, Shyam Nagar, 
+            Ajmer Road, Kalwar Road, Jhotwara, Vidhyadhar Nagar, Murlipura, Sitapura, 
+            Pratap Nagar, Durgapura, Gopalpura, Sodala, Mahesh Nagar, Chandpole, 
+            MI Road, Pink City (Old Jaipur), Ram Nagar, Nirman Nagar, Hasanpura, 
+            Kanakpura, Muhana, Chitrakoot, Govindpura, Kardhani, Harmada.
+          </p>
+        </div>
         </div>
       </section>
 

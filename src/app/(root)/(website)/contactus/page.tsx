@@ -122,10 +122,10 @@ const ContactUs = () => {
                   Order thousands of products at just a tap - from groceries and fresh vegetables to electronics and baby care. We get it delivered to your doorstep in the fastest and safest way possible.
                 </p>
                 <div className="flex flex-wrap gap-4">
-                   <div className="px-4 py-2 bg-slate-800 rounded-full text-xs font-bold border border-slate-700">Groceries</div>
+                   <div className="px-4 py-2 bg-slate-800 rounded-full text-xs font-bold border border-slate-700">Daily Essentials</div>
                    <div className="px-4 py-2 bg-slate-800 rounded-full text-xs font-bold border border-slate-700">Electronics</div>
-                   <div className="px-4 py-2 bg-slate-800 rounded-full text-xs font-bold border border-slate-700">Bakery</div>
-                   <div className="px-4 py-2 bg-slate-800 rounded-full text-xs font-bold border border-slate-700">Meats</div>
+                   <div className="px-4 py-2 bg-slate-800 rounded-full text-xs font-bold border border-slate-700">Bakery & Snacks</div>
+                   <div className="px-4 py-2 bg-slate-800 rounded-full text-xs font-bold border border-slate-700">Home Essentials</div>
                 </div>
               </div>
               
@@ -144,21 +144,34 @@ const ContactUs = () => {
         {/* --- CITY LIST SECTION --- */}
         <section className="mt-20">
         <div className="text-center mb-10">
-            <h3 className="text-3xl font-black">Cities we currently serve</h3>
+            <h3 className="text-3xl font-black">Areas we currently serve</h3>
             <p className="text-slate-400 text-sm font-bold mt-2 uppercase tracking-widest">
-            Available in 100+ locations across India
+                Available across multiple locations in Jaipur
             </p>
         </div>
 
-        {/* Removed 'overflow-y-auto' and 'custom-scrollbar' to eliminate scrolling */}
-        <div className="bg-white rounded-[3rem] p-12 border border-slate-200 shadow-sm min-h-125 flex flex-wrap content-start gap-x-6 gap-y-3">
-            {[
-            "Agra", "Ahmedabad", "Ajmer", "Akola", "Aligarh", "Alwar", "Amravati", "Amritsar", "Anand", "Ankleshwar", "Asansol", "Aurangabad", "Ayodhya", "Bahadurgarh", "Ballari", "Bardhaman", "Bareilly", "Bathinda", "Begusarai", "Belagavi", "Bengaluru", "Bhopal", "Bhagalpur", "Bharuch", "Bhavnagar", "Bhimavaram", "Bhiwadi", "Bhubaneswar", "Bhuj", "Bidar", "Bikaner", "Bokaro", "Chandigarh", "Chandrapur", "Chennai", "Coimbatore", "Cuttack", "Darbhanga", "Davanagere", "Dehradun", "Dewas", "Deoria", "Delhi", "Dhanbad", "Dharamshala", "Dharwad", "Durg", "Durgapur", "Erode", "Faridabad", "Firozabad", "Firozpur", "Gandhidham", "Gaya", "Ghaziabad", "Goa", "Gonda", "Gorakhpur", "Greater Noida", "Guntur", "Guwahati", "Gwalior", "Haldwani", "Hamirpur", "Haridwar", "Hassan", "Hisar", "Hoshiarpur", "Hosur", "Hubballi", "Hyderabad", "Indore", "Jabalpur", "Jaipur", "Jalandhar", "Jammu", "Jamshedpur", "Jaunpur", "Jind", "Jodhpur", "Kaithal", "Kakinada", "Kalaburagi", "Kanpur", "Kapurthala", "Karnal", "Kharagpur", "Kharar", "Khanna", "Kochi", "Kolhapur", "Kolkata", "Kota", "Kotdwar", "Kottayam", "Kozhikode", "Kurnool", "Kurukshetra", "Lakhimpur", "Latur", "Lucknow", "Ludhiana", "Madurai", "Mangaluru", "Manali", "Manipal", "Mathura", "Meerut", "Mehsana", "Mohali", "Moga", "Modinagar", "Moradabad", "Mumbai", "Muzaffarnagar", "Muzaffarpur", "Mysuru", "Nadiad", "Nagpur", "Narmadapuram", "Nashik", "Navsari", "Nellore", "Noida", "Panipat", "Panchkula", "Patiala", "Patna", "Pathankot", "Phagwara", "Prayagraj", "Puducherry", "Pune", "Puri", "Purnia", "Raebareli", "Raipur", "Rajahmundry", "Rajkot", "Rajpura", "Rampur", "Ranchi", "Rewari", "Rishikesh", "Rohtak", "Roorkee", "Rudrapur", "Saharanpur", "Salem", "Sangrur", "Satna", "Satara", "Shillong", "Shivamogga", "Sikar", "Siliguri", "Sirsa", "Sitapur", "Solan", "Solapur", "Sonipat", "Sri Ganganagar", "Surat", "Thiruvananthapuram", "Tiruchirappalli", "Tirupati", "Tumakuru", "Udaipur", "Udupi", "Una", "Unnao", "Ujjain", "Vadodara", "Vapi", "Varanasi", "Vellore", "Vijayapura", "Vijayawada", "Visakhapatnam", "Vizianagaram", "Vrindavan", "Warangal", "Yamunanagar"
-            ].map((city, index, array) => (
-            <span key={city} className="text-sm text-slate-500 font-medium hover:text-green-500 cursor-default transition-colors">
-                {city}{index !== array.length - 1 ? " •" : ""}
+        <div className="bg-white rounded-[3rem] p-12 border border-slate-200 shadow-sm min-h-60 flex flex-wrap content-start gap-x-6 gap-y-3">
+          {[
+            "Vaishali Nagar", "Mansarovar", "Malviya Nagar", "Jagatpura", "Sanganer",
+            "Tonk Road", "Raja Park", "Adarsh Nagar", "Bapu Nagar", "C-Scheme",
+            "Civil Lines", "Shyam Nagar", "Ajmer Road", "Kalwar Road", "Jhotwara",
+            "Vidhyadhar Nagar", "Murlipura", "Sitapura", "Pratap Nagar", "Durgapura",
+            "Gopalpura", "Sodala", "Mahesh Nagar", "Chandpole", "MI Road",
+            "Pink City", "Ram Nagar", "Nirman Nagar", "Hasanpura", "Kanakpura",
+            "Muhana", "Chitrakoot", "Govindpura", "Kardhani", "Harmada",
+            "Bani Park", "Shastri Nagar", "Jawahar Nagar", "Transport Nagar",
+            "Kho Nagoriyan", "Amer", "Jagatpura Extension", "Sikar Road",
+            "Sirsi Road", "Patrakar Colony", "Gokulpura", "Heerapura"
+          ].map((city, index, array) => (
+            <span
+              key={city}
+              style={{ animationDelay: `${index * 0.05}s` }}
+              className="text-sm text-slate-500 font-medium cursor-pointer transition-all duration-300 hover:text-green-600 hover:scale-110 animate-fadeInUp"
+            >
+              {city}
+              {index !== array.length - 1 && " •"}
             </span>
-            ))}
+          ))}
         </div>
         </section>
       </div>
@@ -166,7 +179,7 @@ const ContactUs = () => {
       {/* --- FOOTER COPYRIGHT --- */}
       <footer className="mt-20 text-center px-6">
         <div className="max-w-7xl mx-auto border-t border-slate-200 pt-10">
-          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">Blink Commerce Private Limited</p>
+          <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-2">FreshCart Commerce Private Limited</p>
           <p className="text-[10px] text-slate-400 max-w-xl mx-auto leading-relaxed">
             By continuing past this page, you agree to our Terms of Service, Cookie Policy, Staff Policy and Privacy Policy. All trademarks are properties of their respective owners. © 2016-2026 green.
           </p>
