@@ -307,7 +307,7 @@ const OrderModal = ({
           <div className="bg-gray-50 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <FiMapPin size={13} className="text-gray-400" />
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Delivery Address</p>
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Delivery Address</p>  
             </div>
             <p className="text-sm text-gray-700">{order.address.fullAddress}</p>
             {order.address.city && (

@@ -8,7 +8,7 @@ export async function PUT(req: NextRequest) {
   try {
     await connectDB()
     const body = await req.json()
-    const { orderId, status, isPaid } = body  // ← match the frontend's field names
+    const { orderId, status, isPaid } = body  
 
     console.log("BODY:", body)
 
@@ -42,15 +42,5 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ success: false, message: 'Failed to update order' }, { status: 500 })
   }
 }
-
-
-
-
-
-
-
-
-
-
 
 

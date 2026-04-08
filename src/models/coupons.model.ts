@@ -5,38 +5,38 @@ const CouponSchema = new mongoose.Schema({
     type: String, 
     required: true, 
     unique: true, 
-    uppercase: true 
-},
+    uppercase: true,
+    trim: true,       
+  },
   discountType: { 
     type: String, 
     enum: ["percentage", "fixed"], 
-    required: true 
-},
+    required: true,
+  },
   discountValue: { 
     type: Number, 
-    required: true 
-},
+    required: true,
+  },
   expiryDate: { 
     type: Date, 
-    required: true 
-},
+    required: true,
+  },
   usageLimit: { 
     type: Number, 
-    default: 0 
-},
+    default: null,    
+  },
   usedCount: { 
     type: Number, 
-    default: 0 
-},
+    default: 0,
+  },
   minPurchase: {
-     type: Number, 
-     default: 0 
-    },
-
+    type: Number, 
+    default: 0,
+  },
   isActive: { 
     type: Boolean, 
-    default: true 
-},
+    default: true,
+  },
 }, { timestamps: true });
 
 export default mongoose.models.Coupon || mongoose.model("Coupon", CouponSchema);

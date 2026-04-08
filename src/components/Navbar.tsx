@@ -16,7 +16,6 @@ import { RootState } from '@/redux/store'
 import CartSidebar from '@/app/user/cartsidebar/page'
 
 
-
 interface IUser {
   _id: mongoose.Types.ObjectId
   name: string
@@ -26,6 +25,7 @@ interface IUser {
   role: 'user' | 'deliveryBoy' | 'admin'
   image?: string
 }
+
 
 const Navbar = ({ user }: { user?: IUser }) => {
   const [open, setOpen] = useState(false)
@@ -116,6 +116,14 @@ useEffect(() => {
     : location.split(',').slice(0, 2).join(', ')
 
   const isAdmin = user?.role === 'admin'
+
+  const isDeliveryBoy = user?.role === 'deliveryBoy'
+
+//   {!isDeliveryBoy && (
+//   <div ref={locationRef} className="relative">
+//     {/* location dropdown code */}
+//   </div>
+// )}
 
   return (
     <>
@@ -229,102 +237,113 @@ useEffect(() => {
                 <span className="hidden sm:inline">Fresh<span className="text-green-600">Cart</span></span>
               </Link>
 
-              {/* Location Dropdown */}
-              <div ref={locationRef} className="relative">
-                <button
-                  onClick={() => setLocationOpen((p) => !p)}
-                  className="flex items-center gap-2 hover:bg-gray-50 px-2 md:px-3 py-1.5 md:py-2 rounded-xl transition cursor-pointer max-w-40 sm:max-w-55 md:max-w-none"
-                  aria-label="Change delivery location"
-                >
-                  <div className="bg-green-100 p-1.5 md:p-2 rounded-full shrink-0">
-                    <MapPin size={15} className="text-green-600" />
-                  </div>
-                  <div className="flex flex-col text-left min-w-0">
-                    <span className="text-xs md:text-sm font-bold text-black leading-tight">Delivery in 30 min</span>
-                    <span className="text-[10px] md:text-xs font-semibold text-gray-500 truncate max-w-30 md:max-w-45">{shortLocation}</span>
-                  </div>
-                </button>
 
-                <AnimatePresence>
-                  {locationOpen && (
-                    <motion.div
-                      initial={{ y: 8, opacity: 0, scale: 0.97 }}
-                      animate={{ y: 0, opacity: 1, scale: 1 }}
-                      exit={{ y: 8, opacity: 0, scale: 0.97 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute top-full mt-3 z-50 bg-white border border-gray-100 shadow-2xl rounded-2xl p-4 w-[calc(100vw-2rem)] max-w-sm left-0 sm:left-auto sm:w-95"
-                    >
-                      <div className="flex items-center justify-between mb-4">
-                        <h3 className="font-bold text-base text-gray-800">Change Location</h3>
-                        <button onClick={() => setLocationOpen(false)} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition">
-                          <X size={16} />
-                        </button>
-                      </div>
+              {!isDeliveryBoy && (
+                <div ref={locationRef} className="relative">
+                  {/* Location Dropdown */}
+                            <div ref={locationRef} className="relative">
+                              <button
+                                onClick={() => setLocationOpen((p) => !p)}
+                                className="flex items-center gap-2 hover:bg-gray-50 px-2 md:px-3 py-1.5 md:py-2 rounded-xl transition cursor-pointer max-w-40 sm:max-w-55 md:max-w-none"
+                                aria-label="Change delivery location"
+                              >
+                                <div className="bg-green-100 p-1.5 md:p-2 rounded-full shrink-0">
+                                  <MapPin size={15} className="text-green-600" />
+                                </div>
+                                <div className="flex flex-col text-left min-w-0">
+                                  <span className="text-xs md:text-sm font-bold text-black leading-tight">Delivery in 30 min</span>
+                                  <span className="text-[10px] md:text-xs font-semibold text-gray-500 truncate max-w-30 md:max-w-45">{shortLocation}</span>
+                                </div>
+                              </button>
 
-                      <button
-                        onClick={detectLocation} disabled={detecting}
-                        className="flex items-center gap-3 w-full p-3 rounded-xl bg-green-50 hover:bg-green-100 transition mb-3 disabled:opacity-60"
-                      >
-                        {detecting ? <Loader2 size={18} className="text-green-600 animate-spin" /> : <LocateFixed size={18} className="text-green-600" />}
-                        <div className="flex flex-col text-left">
-                          <span className="font-semibold text-sm text-gray-800">{detecting ? 'Detecting…' : 'Use my current location'}</span>
-                          <span className="text-xs text-gray-500">Accurate GPS-based detection</span>
-                        </div>
-                      </button>
+                              <AnimatePresence>
+                                {locationOpen && (
+                                  <motion.div
+                                    initial={{ y: 8, opacity: 0, scale: 0.97 }}
+                                    animate={{ y: 0, opacity: 1, scale: 1 }}
+                                    exit={{ y: 8, opacity: 0, scale: 0.97 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="absolute top-full mt-3 z-50 bg-white border border-gray-100 shadow-2xl rounded-2xl p-4 w-[calc(100vw-2rem)] max-w-sm left-0 sm:left-auto sm:w-95"
+                                  >
+                                    <div className="flex items-center justify-between mb-4">
+                                      <h3 className="font-bold text-base text-gray-800">Change Location</h3>
+                                      <button onClick={() => setLocationOpen(false)} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition">
+                                        <X size={16} />
+                                      </button>
+                                    </div>
 
-                      <div className="flex items-center gap-2 my-3">
-                        <div className="flex-1 h-px bg-gray-200" />
-                        <span className="text-xs text-gray-400 font-medium">or search</span>
-                        <div className="flex-1 h-px bg-gray-200" />
-                      </div>
+                                    <button
+                                      onClick={detectLocation} disabled={detecting}
+                                      className="flex items-center gap-3 w-full p-3 rounded-xl bg-green-50 hover:bg-green-100 transition mb-3 disabled:opacity-60"
+                                    >
+                                      {detecting ? <Loader2 size={18} className="text-green-600 animate-spin" /> : <LocateFixed size={18} className="text-green-600" />}
+                                      <div className="flex flex-col text-left">
+                                        <span className="font-semibold text-sm text-gray-800">{detecting ? 'Detecting…' : 'Use my current location'}</span>
+                                        <span className="text-xs text-gray-500">Accurate GPS-based detection</span>
+                                      </div>
+                                    </button>
 
-                      <div className="relative mb-2">
-                        <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                        <input
-                          value={query}
-                          onChange={(e) => searchLocation(e.target.value)}
-                          placeholder="Search area, street, city…"
-                          className="w-full border border-gray-200 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50"
-                        />
-                        {query && (
-                          <button onClick={() => { setQuery(''); setResults([]) }} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                            <X size={14} />
-                          </button>
-                        )}
-                      </div>
+                                    <div className="flex items-center gap-2 my-3">
+                                      <div className="flex-1 h-px bg-gray-200" />
+                                      <span className="text-xs text-gray-400 font-medium">or search</span>
+                                      <div className="flex-1 h-px bg-gray-200" />
+                                    </div>
 
-                      {results.length > 0 && (
-                        <div className="max-h-52 overflow-y-auto rounded-xl border border-gray-100 divide-y divide-gray-50">
-                          {results.map((item: any) => (
-                            <button key={item.place_id} onClick={() => saveLocation(item.display_name)} className="flex items-start gap-3 w-full text-left px-3 py-2.5 hover:bg-green-50 transition">
-                              <MapPin size={14} className="mt-0.5 shrink-0 text-green-500" />
-                              <span className="text-sm text-gray-700 leading-snug">{item.display_name}</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                                    <div className="relative mb-2">
+                                      <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                      <input
+                                        value={query}
+                                        onChange={(e) => searchLocation(e.target.value)}
+                                        placeholder="Search area, street, city…"
+                                        className="w-full border border-gray-200 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50"
+                                      />
+                                      {query && (
+                                        <button onClick={() => { setQuery(''); setResults([]) }} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
+                                          <X size={14} />
+                                        </button>
+                                      )}
+                                    </div>
 
-                      {query.length >= 3 && results.length === 0 && (
-                        <p className="text-sm text-center text-gray-400 py-3">No results found. Try a different query.</p>
-                      )}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
+                                    {results.length > 0 && (
+                                      <div className="max-h-52 overflow-y-auto rounded-xl border border-gray-100 divide-y divide-gray-50">
+                                        {results.map((item: any) => (
+                                          <button key={item.place_id} onClick={() => saveLocation(item.display_name)} className="flex items-start gap-3 w-full text-left px-3 py-2.5 hover:bg-green-50 transition">
+                                            <MapPin size={14} className="mt-0.5 shrink-0 text-green-500" />
+                                            <span className="text-sm text-gray-700 leading-snug">{item.display_name}</span>
+                                          </button>
+                                        ))}
+                                      </div>
+                                    )}
+
+                                    {query.length >= 3 && results.length === 0 && (
+                                      <p className="text-sm text-center text-gray-400 py-3">No results found. Try a different query.</p>
+                                    )}
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </div>
+                </div>
+              )}
+              
             </div>
 
-            {/* CENTER: Search bar — desktop */}
+          {!isDeliveryBoy && (
             <div className="flex-1 max-w-xl mx-4 hidden md:block">
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={17} />
-                <input
-                  type="text"
-                  placeholder="Search for fruits, vegetables, dairy…"
-                  className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 transition"
-                />
-              </div>
+              {/* CENTER: Search bar — desktop */}
+                      <div className="flex-1 max-w-xl mx-4 hidden md:block">
+                        <div className="relative">
+                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={17} />
+                          <input
+                            type="text"
+                            placeholder="Search for fruits, vegetables, dairy…"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+                          />
+                        </div>
+                      </div>
             </div>
+          )}
 
+           
             {/* RIGHT: Role badge + User dropdown + Cart */}
             <div className="flex items-center gap-3 md:gap-4 shrink-0">
 
@@ -401,13 +420,12 @@ useEffect(() => {
                 </AnimatePresence>
               </div>
 
-              {/* ── Cart Button → opens CartSidebar ── */}
+              {!isDeliveryBoy && (
               <button
                 onClick={() => setCartOpen(true)}
                 className="relative flex cursor-pointer hover:bg-green-600 items-center justify-center w-9 h-9 md:w-10 md:h-10 bg-green-600 text-white rounded-full transition shadow-md"
-                aria-label="Open cart"
               >
-                <ShoppingCart size={19} />
+               <ShoppingCart size={19} />
                 <AnimatePresence>
                 {mounted && totalItems > 0 && (
                   <motion.span
@@ -422,21 +440,27 @@ useEffect(() => {
                 )}
               </AnimatePresence>
               </button>
+            )}
 
             </div>
           </div>
 
+          {!isDeliveryBoy && (
+        <div className="mt-2.5 md:hidden">
           {/* Mobile Search Bar */}
-          <div className="mt-2.5 md:hidden">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-              <input
-                type="text"
-                placeholder="Search fruits, vegetables, dairy…"
-                className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 transition"
-              />
-            </div>
+                <div className="mt-2.5 md:hidden">
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
+                    <input
+                      type="text"
+                      placeholder="Search fruits, vegetables, dairy…"
+                      className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+                    />
+                    </div>
+                  </div>
           </div>
+        )}
+
         </nav>
       )}
 

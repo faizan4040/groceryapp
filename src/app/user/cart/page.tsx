@@ -210,7 +210,7 @@ export default function CartPage() {
           </h2>
 
           {/* Promo */}
-          <div>
+          {/* <div>
             <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2 block">
               Promo Code
             </label>
@@ -238,7 +238,7 @@ export default function CartPage() {
               </p>
             )}
             {promoError && <p className="text-xs text-red-500 mt-1.5">{promoError}</p>}
-          </div>
+          </div> */}
 
           {/* Line items */}
           <div className="space-y-3 text-sm">
@@ -276,16 +276,16 @@ export default function CartPage() {
 
           {/* Total */}
           <div className="flex justify-between items-center">
-            <span className="font-bold text-gray-800 text-base">Total</span>
-            <span className="text-2xl font-bold text-green-700" style={{ fontFamily: "'Playfair Display', serif" }}>
-              {fmt(total)}
-            </span>
-          </div>
+          <span className="font-bold text-gray-800 text-base">Total</span>
+          <span className="text-2xl font-bold text-green-700 font-fancy">
+            {fmt(total)}
+          </span>
+        </div>
 
           {/* CTA */}
           <motion.button
             whileTap={{ scale: 0.97 }}
-            className="w-full py-4 bg-green-600 cursor-pointer hover:bg-green-700 text-white font-bold rounded-2xl text-base shadow-lg shadow-green-200 transition-all"
+            className="w-full py-4 bg-green-600 cursor-pointer hover:bg-black transition-all duration-300 text-white font-bold rounded-2xl text-base shadow-lg shadow-green-200"
             onClick={() => router.push("/user/checkout")}>
             Proceed to Checkout →
           </motion.button>

@@ -194,7 +194,7 @@ export default function Coupons() {
             initial={{ opacity: 0, y: 20, x: "-50%" }}
             animate={{ opacity: 1, y: 0, x: "-50%" }}
             exit={{ opacity: 0, scale: 0.95, x: "-50%" }}
-            className={`fixed bottom-10 left-1/2 z-50 flex items-center gap-3 bg-white border px-6 py-4 rounded-2xl shadow-2xl min-w-[300px] ${
+            className={`fixed bottom-10 left-1/2 z-50 flex items-center gap-3 bg-white border px-6 py-4 rounded-2xl shadow-2xl min-w-75 ${
               toast.type === "success" ? "border-green-200" : "border-red-200"
             }`}
           >

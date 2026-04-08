@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { motion } from "motion/react";
 import { User, Shield, Truck, Phone, Loader2 } from "lucide-react";
@@ -8,19 +8,41 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 
-const roles = [
-  { id: "user", label: "Customer", icon: User, color: "bg-green-500" },
-  { id: "admin", label: "Admin", icon: Shield, color: "bg-purple-500" },
-  { id: "deliveryBoy", label: "Delivery Boy", icon: Truck, color: "bg-orange-500" },
-];
-
 const EditRolemobile = () => {
   const [selectedRole, setSelectedRole] = useState("");
   const [mobile, setMobile] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // roles as state (IMPORTANT)
+  const [rolesState, setRolesState] = useState([
+    { id: "user", label: "Customer", icon: User, color: "bg-green-500" },
+    { id: "admin", label: "Admin", icon: Shield, color: "bg-purple-500" },
+    { id: "deliveryBoy", label: "Delivery Boy", icon: Truck, color: "bg-orange-500" },
+  ]);
+
   const router = useRouter();
   const { update } = useSession();
+
+  // check admin on page load
+  useEffect(() => {
+    checkForAdmin();
+  }, []);
+
+  const checkForAdmin = async () => {
+    try {
+      const res = await axios.get("/api/check-for-admin");
+
+      console.log("ADMIN CHECK:", res.data); 
+
+      if (res.data.adminExist) {
+        setRolesState((prev) =>
+          prev.filter((role) => role.id !== "admin")
+        );
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const handleSubmit = async () => {
     if (!selectedRole) {
@@ -41,7 +63,6 @@ const EditRolemobile = () => {
         mobile,
       });
 
-      // Proper success check
       if (!res.data.success) {
         toast.error(res.data.message || "Update failed");
         return;
@@ -53,7 +74,6 @@ const EditRolemobile = () => {
       });
 
       toast.success("Profile updated successfully");
-
       router.replace("/");
     } catch (error: any) {
       console.log("API ERROR:", error);
@@ -82,8 +102,9 @@ const EditRolemobile = () => {
           Select role and add mobile number
         </p>
 
+        {/* USE rolesState HERE */}
         <div className="grid md:grid-cols-3 gap-6 mb-10">
-          {roles.map((r) => {
+          {rolesState.map((r) => {
             const Icon = r.icon;
 
             return (
@@ -112,6 +133,7 @@ const EditRolemobile = () => {
           })}
         </div>
 
+        {/* MOBILE INPUT */}
         <div className="relative mb-8">
           <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
           <input
@@ -126,6 +148,7 @@ const EditRolemobile = () => {
           />
         </div>
 
+        {/* BUTTON */}
         <motion.button
           whileHover={{ scale: 1.03 }}
           whileTap={{ scale: 0.97 }}
@@ -148,3 +171,182 @@ const EditRolemobile = () => {
 };
 
 export default EditRolemobile;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// "use client";
+
+// import React, { useState } from "react";
+// import axios from "axios";
+// import { motion } from "motion/react";
+// import { User, Shield, Truck, Phone, Loader2 } from "lucide-react";
+// import toast from "react-hot-toast";
+// import { useRouter } from "next/navigation";
+// import { useSession } from "next-auth/react";
+
+// const roles = [
+//   { id: "user", label: "Customer", icon: User, color: "bg-green-500" },
+//   { id: "admin", label: "Admin", icon: Shield, color: "bg-purple-500" },
+//   { id: "deliveryBoy", label: "Delivery Boy", icon: Truck, color: "bg-orange-500" },
+// ];
+
+// const EditRolemobile = () => {
+//   const [selectedRole, setSelectedRole] = useState("");
+//   const [mobile, setMobile] = useState("");
+//   const [loading, setLoading] = useState(false);
+//   const [rolesState, setRolesState] = useState(roles);
+//   const router = useRouter();
+//   const { update } = useSession();
+
+//   const handleSubmit = async () => {
+//     if (!selectedRole) {
+//       toast.error("Please select a role");
+//       return;
+//     }
+
+//     if (!mobile || mobile.length !== 10) {
+//       toast.error("Enter a valid 10-digit mobile number");
+//       return;
+//     }
+
+//     setLoading(true);
+
+//     try {
+//       const res = await axios.post("/api/auth/user/edit-role-mobile", {
+//         role: selectedRole,
+//         mobile,
+//       });
+
+//       // Proper success check
+//       if (!res.data.success) {
+//         toast.error(res.data.message || "Update failed");
+//         return;
+//       }
+
+//       await update({
+//         role: selectedRole,
+//         mobile,
+//       });
+
+//       toast.success("Profile updated successfully");
+
+//       router.replace("/");
+//     } catch (error: any) {
+//       console.log("API ERROR:", error);
+
+//       toast.error(
+//         error?.response?.data?.message || "Server error"
+//       );
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   const checkForAdmin = async () => {
+//     try {
+//       const res = await axios.get("/api/check-for-admin");
+
+//       if (res.data.adminExist) {
+//         setRolesState((prev) =>
+//           prev.filter((role) => role.id !== "admin")
+//         );
+//       }
+//     } catch (error) {
+//       console.log(error);
+//     }
+//   };
+
+//   return (
+//     <div className="min-h-screen flex items-center justify-center bg-linear-to-br from-green-100 via-white to-yellow-100 p-6">
+//       <motion.div
+//         initial={{ opacity: 0, scale: 0.9, y: 40 }}
+//         animate={{ opacity: 1, scale: 1, y: 0 }}
+//         transition={{ duration: 0.6 }}
+//         className="w-full max-w-3xl bg-white/80 backdrop-blur-xl border border-gray-200 shadow-2xl rounded-3xl p-10"
+//       >
+//         <h1 className="text-4xl font-extrabold text-green-700 text-center mb-2">
+//           Complete Your Profile
+//         </h1>
+
+//         <p className="text-gray-600 text-center mb-8">
+//           Select role and add mobile number
+//         </p>
+
+//         <div className="grid md:grid-cols-3 gap-6 mb-10">
+//           {roles.map((r) => {
+//             const Icon = r.icon;
+
+//             return (
+//               <motion.div
+//                 key={r.id}
+//                 whileHover={{ scale: 1.05 }}
+//                 whileTap={{ scale: 0.97 }}
+//                 onClick={() => setSelectedRole(r.id)}
+//                 className={`cursor-pointer rounded-2xl p-6 border transition-all ${
+//                   selectedRole === r.id
+//                     ? "border-green-500 bg-green-50 shadow-xl"
+//                     : "border-gray-200 bg-white hover:shadow-lg"
+//                 }`}
+//               >
+//                 <div
+//                   className={`w-14 h-14 mx-auto flex items-center justify-center rounded-full text-white mb-4 ${r.color}`}
+//                 >
+//                   <Icon size={26} />
+//                 </div>
+
+//                 <h3 className="text-lg font-semibold text-center">
+//                   {r.label}
+//                 </h3>
+//               </motion.div>
+//             );
+//           })}
+//         </div>
+
+//         <div className="relative mb-8">
+//           <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" />
+//           <input
+//             type="tel"
+//             placeholder="Enter mobile number"
+//             value={mobile}
+//             maxLength={10}
+//             onChange={(e) =>
+//               setMobile(e.target.value.replace(/\D/g, ""))
+//             }
+//             className="w-full border border-gray-200 rounded-xl py-4 pl-12 pr-4 text-lg focus:ring-2 focus:ring-green-500 outline-none"
+//           />
+//         </div>
+
+//         <motion.button
+//           whileHover={{ scale: 1.03 }}
+//           whileTap={{ scale: 0.97 }}
+//           onClick={handleSubmit}
+//           disabled={loading}
+//           className="w-full bg-green-600 text-white py-4 rounded-xl text-lg font-semibold flex items-center justify-center gap-2 disabled:opacity-60"
+//         >
+//           {loading ? (
+//             <>
+//               <Loader2 size={20} className="animate-spin" />
+//               Saving...
+//             </>
+//           ) : (
+//             "Continue"
+//           )}
+//         </motion.button>
+//       </motion.div>
+//     </div>
+//   );
+// };
+
+// export default EditRolemobile;

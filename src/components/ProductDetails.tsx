@@ -10,6 +10,11 @@ import {
   CheckCircle, Tag, Package, Truck, ChevronLeft
 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import ReviewSection from './ReviewSection'
+import { useSession } from "next-auth/react";
+
+
+
 
 export default function ProductDetailClient({ product }: { product: IGrocery }) {
   const router = useRouter()
@@ -17,7 +22,7 @@ export default function ProductDetailClient({ product }: { product: IGrocery }) 
   const [pincode, setPincode] = useState('')
   const [pincodeMsg, setPincodeMsg] = useState<string | null>(null)
   const [buyNowLoading, setBuyNowLoading] = useState(false)
-
+  const { data: session } = useSession();
   const id = product._id.toString()
 
   const cartItem = useSelector((state: RootState) =>
@@ -67,6 +72,8 @@ export default function ProductDetailClient({ product }: { product: IGrocery }) 
   }
 
   return (
+    <>
+    
     <div className="space-y-5">
       {/* Back */}
       <button
@@ -275,5 +282,20 @@ export default function ProductDetailClient({ product }: { product: IGrocery }) 
         </p>
       </div>
     </div>
+
+    <div>
+        <div>
+        <ReviewSection
+          groceryId={product._id.toString()}
+          userId={session?.user?.id || null}
+        />
+      </div>
+      </div>
+      
+    </>
+   
+
+
+
   )
 }

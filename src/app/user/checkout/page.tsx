@@ -48,9 +48,7 @@ const fmt = (n: number) =>
 const DELIVERY_THRESHOLD = 499
 const DELIVERY_FEE       = 49
 
-const VALID_COUPONS: Record<string, number> = {
-  SAVE50: 50, FIRST100: 100, FRESH20: 20,
-}
+
 
 type PaymentMethod = 'cod' | 'upi'
 
@@ -135,9 +133,13 @@ export default function Checkout() {
   const [paidTotal,     setPaidTotal]     = useState(0)
 
   /* ── Coupon ── */
-  const [coupon,        setCoupon]        = useState('')
-  const [couponApplied, setCouponApplied] = useState(false)
-  const [couponError,   setCouponError]   = useState('')
+// ── Coupon ── (REPLACE the existing coupon state)
+const [coupon,          setCoupon]          = useState('')
+const [couponApplied,   setCouponApplied]   = useState(false)
+const [couponError,     setCouponError]     = useState('')
+const [couponLoading,   setCouponLoading]   = useState(false)
+const [discountAmount,  setDiscountAmount]  = useState(0)   // ← NEW: actual ₹ from API
+const [appliedCode,     setAppliedCode]     = useState('')  // ← NEW: confirmed code
 
   /* ── Map position ── */
   const [position,      setPosition]      = useState<[number, number] | null>(null)
@@ -218,19 +220,31 @@ export default function Checkout() {
   }, [])
 
   /* ─── Coupon ─── */
-  const discount = couponApplied && VALID_COUPONS[coupon.toUpperCase()]
-    ? VALID_COUPONS[coupon.toUpperCase()]
-    : 0
+const discount = discountAmount  // ← now comes from API
 
-  const handleCoupon = () => {
-    if (VALID_COUPONS[coupon.toUpperCase()]) {
-      setCouponApplied(true)
-      setCouponError('')
-    } else {
-      setCouponApplied(false)
-      setCouponError('Invalid code. Try SAVE50, FIRST100 or FRESH20.')
-    }
+const handleCoupon = async () => {
+  if (!coupon.trim()) return
+  setCouponLoading(true)
+  setCouponError('')
+
+  try {
+    const { data } = await axios.post('/api/coupons/validate', {
+      code: coupon,
+      cartTotal: subtotal,
+    })
+    setCouponApplied(true)
+    setDiscountAmount(data.coupon.discountAmount)
+    setAppliedCode(data.coupon.code)
+    setCouponError('')
+  } catch (err: any) {
+    setCouponApplied(false)
+    setDiscountAmount(0)
+    setAppliedCode('')
+    setCouponError(err.response?.data?.message || 'Invalid coupon code')
+  } finally {
+    setCouponLoading(false)
   }
+}
 
   /* ─── Totals ─── */
   const subtotal   = cartData.reduce((s, i) => s + i.price * i.quantity, 0)
@@ -663,12 +677,16 @@ export default function Checkout() {
                         className="w-full pl-9 pr-3 h-10 rounded-xl border border-gray-200 bg-gray-50 focus:outline-none focus:ring-2 focus:ring-emerald-400 text-sm transition"
                       />
                     </div>
-                    <button
-                      onClick={handleCoupon}
-                      className="px-4 h-10 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 active:scale-95 transition shrink-0"
-                    >
-                      Apply
-                    </button>
+                   <button
+                    onClick={handleCoupon}
+                    disabled={couponLoading} 
+                    className="px-4 h-10 rounded-xl bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 active:scale-95 transition shrink-0 disabled:opacity-60"
+                  >
+                    {couponLoading
+                      ? <FaSpinner className="animate-spin mx-auto" />
+                      : 'Apply'
+                    }
+                  </button>
                   </div>
                   <AnimatePresence>
                     {couponApplied && (
