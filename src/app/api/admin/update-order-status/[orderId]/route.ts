@@ -1,4 +1,5 @@
 import connectDB from "@/lib/db";
+import emitEventHandler from "@/lib/emitEventHandler";
 import DeliveryAssignment from "@/models/deliveryAssignment.model";
 import Order from "@/models/order.model";
 import User from "@/models/user.models";
@@ -68,6 +69,8 @@ export async function POST(
       if (candidates.length === 0) {
         await order.save();
 
+        await emitEventHandler("order-status-update",{ orderId:order._id, status:order.status})
+
         return NextResponse.json(
           { success: false, message: "No delivery boys available" },
           { status: 200 }
@@ -95,6 +98,8 @@ export async function POST(
 
     await order.save();
     await order.populate("user");
+    
+    await emitEventHandler("order-status-update",{ orderId:order._id, status:order.status})
 
     return NextResponse.json(
       {

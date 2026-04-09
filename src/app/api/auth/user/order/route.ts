@@ -4,6 +4,7 @@ import User from "@/models/user.models";
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import Razorpay from "razorpay";
+import emitEventHandler from "@/lib/emitEventHandler";
 
 export async function POST(req: NextRequest) {
   try {
@@ -92,6 +93,8 @@ export async function POST(req: NextRequest) {
         isPaid: false,
       });
 
+      await emitEventHandler("new-order", order);
+
       console.log("COD ORDER CREATED:", order._id);
 
       return NextResponse.json({
@@ -100,7 +103,8 @@ export async function POST(req: NextRequest) {
         orderId: order._id,
       });
     }
-
+    
+     
     /* ───────────────────────── RAZORPAY FLOW ───────────────────────── */
 
     if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {

@@ -12,7 +12,6 @@ import GeoUpdater from '@/components/GeoUpdater';
 import DeliveryBoy from '@/components/DeliveryBoy';
 
 
-
 const Home = async () => {
 
   await connectDB()
@@ -45,9 +44,9 @@ const Home = async () => {
         <UserDashboard />
       ) : user.role === "admin" ? (
         <AdminDashboard children={undefined} />
-      ) : (
-        <DeliveryBoy />
-      )}
+      ) : user.role === "delivery" || user.role === "deliveryBoy" ? (
+          <DeliveryBoy /> 
+        ) : null}
     </div>
   )
 }

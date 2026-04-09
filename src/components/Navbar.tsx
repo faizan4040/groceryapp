@@ -119,11 +119,7 @@ useEffect(() => {
 
   const isDeliveryBoy = user?.role === 'deliveryBoy'
 
-//   {!isDeliveryBoy && (
-//   <div ref={locationRef} className="relative">
-//     {/* location dropdown code */}
-//   </div>
-// )}
+
 
   return (
     <>
@@ -405,9 +401,16 @@ useEffect(() => {
                       )}
 
                       <div className="py-1">
-                        <Link href="/user/my-orders" onClick={() => setOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-gray-700 text-sm transition">
+                          {!isDeliveryBoy && (
+                        <div ref={locationRef} className="relative">
+                          <Link href="/user/my-orders" onClick={() => setOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-gray-700 text-sm transition">
                           <Box size={16} /> My Orders
                         </Link>
+                        </div>
+                      )}
+                        {/* <Link href="/user/my-orders" onClick={() => setOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-gray-700 text-sm transition">
+                          <Box size={16} /> My Orders
+                        </Link> */}
                         <button
                           className="flex cursor-pointer items-center gap-3 px-4 py-2.5 hover:bg-red-50 text-red-500 text-sm w-full transition"
                           onClick={() => { setOpen(false); signOut({ callbackUrl: '/login' }) }}

@@ -10,6 +10,8 @@ import {
   FiPhone, FiCreditCard, FiTruck,
 } from 'react-icons/fi'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { getSocket } from '@/lib/socket'
+import { IOrder } from '@/models/order.model'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -258,6 +260,7 @@ const OrderModal = ({
   const [status, setStatus] = useState(order.status)
   const [isPaid, setIsPaid] = useState(order.isPaid)
   const [saving, setSaving] = useState(false)
+  const [orders,setOrders] = useState<IOrder[]>()
 
   const handleSave = async () => {
     setSaving(true)
@@ -265,6 +268,15 @@ const OrderModal = ({
     setSaving(false)
     onClose()
   }
+
+  useEffect(():any=>{
+    const socket=getSocket()
+    socket?.on("new-order",(newOrder)=>{
+      console.log(newOrder)
+      setOrders((prev)=>[newOrder,...prev!])
+    })
+    return ()=>socket.off("new-order")
+  },[])
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
