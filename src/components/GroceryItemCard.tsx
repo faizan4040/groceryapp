@@ -55,7 +55,7 @@ function GroceryItemCard({ item }: { item: IGrocery }) {
       whileInView={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
       viewport={{ once: true, amount: 0.2 }}
-      className="group relative bg-white rounded-2xl border border-gray-100 hover:border-green-200 hover:shadow-lg hover:shadow-green-50 transition-all duration-300 overflow-hidden flex flex-col h-full cursor-pointer" // ✅ cursor-pointer
+      className="group relative bg-white rounded-2xl border border-gray-100 hover:border-green-200 hover:shadow-lg hover:shadow-green-50 transition-all duration-300 overflow-hidden flex flex-col h-full cursor-pointer" //  cursor-pointer
     >
       {hasDiscount && (
         <div className="absolute top-2.5 left-2.5 z-20">

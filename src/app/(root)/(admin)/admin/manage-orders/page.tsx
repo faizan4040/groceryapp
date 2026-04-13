@@ -73,7 +73,7 @@ const PAGE_SIZE = 10
 
 const JOURNEY_STEPS: { key: string; label: string; icon: string }[] = [
   { key: 'pending',           label: 'Placed',           icon: '🛒' },
-  { key: 'confirmed',         label: 'Confirmed',        icon: '✅' },
+  { key: 'confirmed',         label: 'Confirmed',        icon: '' },
   { key: 'shipped',           label: 'Shipped',          icon: '📦' },
   { key: 'out for delivery',  label: 'Out for Delivery', icon: '🚚' },
   { key: 'delivered',         label: 'Delivered',        icon: '🎉' },
@@ -116,7 +116,7 @@ const OrderStatusTracker = ({ status }: { status: string }) => {
 
       {isCancelled ? (
         <div className="flex flex-col items-center gap-2 py-4">
-          <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center text-2xl">❌</div>
+          <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center text-2xl"></div>
           <p className="font-bold text-red-600 text-sm">Order Cancelled</p>
         </div>
       ) : (

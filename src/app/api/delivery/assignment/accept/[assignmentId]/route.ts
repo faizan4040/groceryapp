@@ -68,7 +68,7 @@ export async function POST(
         orderId: String(assignment.order?._id),
       })
     } catch (e) {
-      console.warn('⚠️ Socket emit warning:', e)
+      console.warn(' Socket emit warning:', e)
     }
 
     return NextResponse.json({
@@ -76,7 +76,7 @@ export async function POST(
       message: 'Order accepted!',
     })
   } catch (error: unknown) {
-    console.error('❌ Accept error:', error)
+    console.error(' Accept error:', error)
 
     return NextResponse.json(
       {
