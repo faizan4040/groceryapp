@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
     }
 
     const assignments = await DeliveryAssignment.find({
-      broadcastedTo: { $in: [userId] },
+      broadcastedTo: { $in: [userId.toString()] },
       status: { $in: ['broadcasted', 'assigned'] },
     })
       .populate({

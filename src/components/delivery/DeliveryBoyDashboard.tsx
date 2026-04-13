@@ -400,10 +400,7 @@ const DeliveryBoyDashboard = () => {
       setLoadingId(assignmentId)
       setError(null)
 
-      const res = await axios.post(
-        `/api/delivery/assignment/reject/${assignmentId}`
-        // No body needed — ID is in the URL
-      )
+      const res = await axios.post(`/api/delivery/assignment/reject/${assignmentId}`)
 
       if (res.data.success) {
         setAssignments((prev) => prev.filter((a) => a._id !== assignmentId))
@@ -442,8 +439,8 @@ const DeliveryBoyDashboard = () => {
   return (
     <div className="min-h-screen bg-slate-50">
       {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-50 shadow-sm">
-        <div className="max-w-xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
+      <main className="max-w-xl mx-auto px-4 py-24 pb-16">
+         <div className="max-w-xl mx-auto px-4 h-16 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center shrink-0">
               <FiTruck size={18} className="text-white" />
@@ -478,9 +475,6 @@ const DeliveryBoyDashboard = () => {
             </button>
           </div>
         </div>
-      </header>
-
-      <main className="max-w-xl mx-auto px-4 py-5 pb-16">
         {/* Error */}
         {error && (
           <div className="mb-4 flex items-start gap-3 bg-red-50 border border-red-200 rounded-xl p-3.5">
