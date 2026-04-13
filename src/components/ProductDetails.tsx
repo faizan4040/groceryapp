@@ -15,7 +15,6 @@ import { useSession } from "next-auth/react";
 
 
 
-
 export default function ProductDetailClient({ product }: { product: IGrocery }) {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
@@ -47,7 +46,7 @@ export default function ProductDetailClient({ product }: { product: IGrocery }) 
       setPincodeMsg('Enter a valid 6-digit pincode')
       return
     }
-    setPincodeMsg('✅ Delivery available in 30 minutes!')
+    setPincodeMsg(' Delivery available in 30 minutes!')
   }
 
   const handleAdd = () => {
@@ -291,11 +290,7 @@ export default function ProductDetailClient({ product }: { product: IGrocery }) 
         />
       </div>
       </div>
-      
     </>
-   
-
-
 
   )
 }

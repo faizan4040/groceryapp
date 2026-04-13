@@ -1,6 +1,4 @@
 import { auth } from "@/auth";
-// app/delivery/page.tsx
-// Protected page — only accessible to users with role: "delivery"
 
 import { redirect } from "next/navigation"
 import DeliveryBoyDashboard from "@/components/delivery/DeliveryBoyDashboard"
@@ -12,14 +10,8 @@ export default async function DeliveryPage() {
     redirect("/login")
   }
 
-  // Uncomment if you store role in session:
-  // if (session.user.role !== "delivery") {
-  //   redirect("/")
-  // }
-
   return <DeliveryBoyDashboard />
 }
-
 
 
 

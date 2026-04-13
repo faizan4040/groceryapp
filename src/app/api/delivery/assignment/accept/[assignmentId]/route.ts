@@ -1,89 +1,93 @@
-import { auth } from "@/auth";
-import { NextRequest, NextResponse } from "next/server";
-import connectDB from "@/lib/db";
-import mongoose from "mongoose";
-import DeliveryAssignment from "@/models/deliveryAssignment.model";
-import Order from "@/models/order.model";
-import emitEventHandler from "@/lib/emitEventHandler";
-import User from "@/models/user.models";
+import { NextResponse } from 'next/server'
+import { auth } from '@/auth'
+import connectDB from '@/lib/db'
+import DeliveryAssignment from '@/models/deliveryAssignment.model'
+import Order from '@/models/order.model'
+import emitEventHandler from '@/lib/emitEventHandler'
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { assignmentId: string } }
+export async function POST(
+  request: Request,
+  context: { params: Promise<{ assignmentId: string }> } // 👈 FIX
 ) {
   try {
-    await connectDB();
+    await connectDB()
 
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
-    }
+    const session = await auth()
+    const userId = session?.user?.id
 
-    const { assignmentId } = params;
-
-    // 1. Find the assignment
-    const assignment = await DeliveryAssignment.findById(assignmentId).populate("order");
-    if (!assignment) {
-      return NextResponse.json({ success: false, message: "Assignment not found" }, { status: 404 });
-    }
-
-    if (assignment.status !== "broadcasted") {
+    if (!userId) {
       return NextResponse.json(
-        { success: false, message: "Assignment already taken or cancelled" },
+        { success: false, message: 'Unauthorized' },
+        { status: 401 }
+      )
+    }
+
+    //  MUST await params
+    const { assignmentId } = await context.params
+
+    console.log('🔥 PARAMS:', assignmentId)
+
+    if (!assignmentId) {
+      return NextResponse.json(
+        { success: false, message: 'Assignment ID missing from URL' },
         { status: 400 }
-      );
+      )
     }
 
-    // 2. Mark assignment as accepted by this delivery boy
-    assignment.status = "accepted";
-    assignment.deliveryBoy = new mongoose.Types.ObjectId(session.user.id);
-    await assignment.save();
+    const assignment = await DeliveryAssignment.findOneAndUpdate(
+      {
+        _id: assignmentId,
+        status: 'broadcasted',
+        broadcastedTo: userId,
+      },
+      {
+        status: 'assigned',
+        assignedTo: String(userId),
+        acceptedAt: new Date(),
+      },
+      { new: true }
+    ).populate('order')
 
-    // 3. Find the delivery boy's socket info to send live-tracking data
-    const deliveryBoy = await User.findById(session.user.id);
-
-    // 4. Notify the customer that delivery boy accepted
-    //    Get customer's socketId from User model
-    const order = await Order.findById(assignment.order._id);
-    const customer = await User.findById(order?.userId);
-
-    if (customer?.socketId) {
-      await emitEventHandler(
-        "delivery-accepted",
-        {
-          assignmentId: assignment._id,
-          orderId: order?._id,
-          deliveryBoy: {
-            name: deliveryBoy?.name,
-            phone: deliveryBoy?.phone,
-          },
-        },
-        customer.socketId
-      );
+    if (!assignment) {
+      return NextResponse.json(
+        { success: false, message: 'Already taken or not available' },
+        { status: 409 }
+      )
     }
 
-    // 5. Notify all OTHER delivery boys that order is taken (remove from their list)
-    const allDeliveryBoys = await User.find({ role: "delivery", _id: { $ne: session.user.id } });
-    for (const boy of allDeliveryBoys) {
-      if (boy.socketId) {
-        await emitEventHandler("assignment-taken", { assignmentId }, boy.socketId);
-      }
+    if (assignment.order?._id) {
+      await Order.findByIdAndUpdate(assignment.order._id, {
+        assignment: assignment._id,
+      })
     }
 
-    const populated = await DeliveryAssignment.findById(assignmentId).populate("order");
+    try {
+      await emitEventHandler('delivery-accepted', {
+        assignmentId: String(assignment._id),
+        deliveryBoyId: String(userId),
+        orderId: String(assignment.order?._id),
+      })
+    } catch (e) {
+      console.warn('⚠️ Socket emit warning:', e)
+    }
 
-    return NextResponse.json({ success: true, assignment: populated });
-  } catch (error: any) {
-    console.error("[accept-assignment]", error);
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+    return NextResponse.json({
+      success: true,
+      message: 'Order accepted!',
+    })
+  } catch (error: unknown) {
+    console.error('❌ Accept error:', error)
+
+    return NextResponse.json(
+      {
+        success: false,
+        message:
+          error instanceof Error ? error.message : 'Server error',
+      },
+      { status: 500 }
+    )
   }
 }
-
-
-
-
-
-
 
 
 // import { auth } from "@/auth";

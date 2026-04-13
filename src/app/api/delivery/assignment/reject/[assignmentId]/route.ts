@@ -1,40 +1,116 @@
-// app/api/delivery/reject/[assignmentId]/route.ts
-import { auth } from "@/auth";
-import { NextRequest, NextResponse } from "next/server";
-import connectDB from "@/lib/db";
-import mongoose from "mongoose";   // ← add this
-import DeliveryAssignment from "@/models/deliveryAssignment.model";
+// ════════════════════════════════════════════════════════════════════
+// FILE: app/api/delivery/assignment/reject/[assignmentId]/route.ts
+// ════════════════════════════════════════════════════════════════════
+
+import { NextResponse } from 'next/server'
+import { auth } from '@/auth'
+import connectDB from '@/lib/db'
+import DeliveryAssignment from '@/models/deliveryAssignment.model'
+import emitEventHandler from '@/lib/emitEventHandler'
 
 export async function POST(
-  req: NextRequest,
-  { params }: { params: { assignmentId: string } }
+  request: Request,
+  context: { params: { assignmentId: string } }
 ) {
   try {
-    await connectDB();
+    await connectDB()
 
-    const session = await auth();
-    if (!session?.user) {
-      return NextResponse.json({ success: false, message: "Unauthorized" }, { status: 401 });
+    const session = await auth()
+    const userId = session?.user?.id
+
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: 'Unauthorized' },
+        { status: 401 }
+      )
     }
 
-    const { assignmentId } = params;
+    // FIXED: match folder name
+    const assignmentId = context?.params?.assignmentId
 
-    const assignment = await DeliveryAssignment.findById(assignmentId);
+    console.log(' PARAMS:', context?.params)
+
+    if (!assignmentId) {
+      return NextResponse.json(
+        { success: false, message: 'Assignment ID missing from URL' },
+        { status: 400 }
+      )
+    }
+
+    console.log(' Reject called — assignmentId:', assignmentId, 'userId:', userId)
+
+    // Atomic update (no duplicate reject)
+    const assignment = await DeliveryAssignment.findOneAndUpdate(
+      {
+        _id: assignmentId,
+        status: 'broadcasted',
+        broadcastedTo: userId,
+        rejectedBy: { $ne: userId },
+      },
+      {
+        $addToSet: { rejectedBy: String(userId) },
+      },
+      { new: true }
+    )
+
     if (!assignment) {
-      return NextResponse.json({ success: false, message: "Assignment not found" }, { status: 404 });
+      return NextResponse.json(
+        {
+          success: false,
+          message: 'Already rejected or not available',
+        },
+        { status: 409 }
+      )
     }
 
-    // Add this delivery boy to rejectedBy list (so they don't see it again)
-    if (!assignment.rejectedBy) assignment.rejectedBy = [];
-    assignment.rejectedBy.push(new mongoose.Types.ObjectId(session.user.id));
+    // Check if all delivery boys rejected
+    const broadcastedTo = (assignment.broadcastedTo || []).map(String)
+    const rejectedBy = (assignment.rejectedBy || []).map(String)
 
-    // If everyone rejected, mark as failed (optional logic)
-    await assignment.save();
+    if (
+      broadcastedTo.length > 0 &&
+      rejectedBy.length >= broadcastedTo.length
+    ) {
+      assignment.status = 'failed'
+      await assignment.save()
 
-    return NextResponse.json({ success: true, message: "Rejected" });
-  } catch (error: any) {
-    console.error("[reject-assignment]", error);
-    return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+      // Emit failure event
+      try {
+        await emitEventHandler('assignment-failed', {
+          assignmentId: String(assignment._id),
+        })
+      } catch (e) {
+        console.warn(' Socket emit warning:', e)
+      }
+    }
+
+    // Remove from UI instantly
+    try {
+      await emitEventHandler('delivery-rejected', {
+        assignmentId: String(assignment._id),
+        deliveryBoyId: String(userId),
+      })
+    } catch (e) {
+      console.warn(' Socket emit warning:', e)
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: 'Order rejected',
+    })
+  } catch (error: unknown) {
+    console.error(' Reject error:', error)
+
+    const message =
+      error instanceof Error ? error.message : 'Server error'
+
+    return NextResponse.json(
+      {
+        success: false,
+        message,
+      },
+      { status: 500 }
+    )
   }
 }
 
@@ -42,47 +118,3 @@ export async function POST(
 
 
 
-// import { auth } from "@/auth";
-// import connectDB from "@/lib/db";
-// import DeliveryAssignment from "@/models/deliveryAssignment.model";
-// import { NextRequest, NextResponse } from "next/server";
-
-// export async function POST(
-//   req: NextRequest,
-//   { params }: { params: { id: string } }
-// ) {
-//   try {
-//     await connectDB();
-
-//     const { id } = params;
-//     const session = await auth();
-//     const deliveryBoyId = session?.user?.id;
-
-//     if (!deliveryBoyId) {
-//       return NextResponse.json({ message: "unauthorized" }, { status: 401 });
-//     }
-
-//     const assignment = await DeliveryAssignment.findById(id);
-
-//     if (!assignment) {
-//       return NextResponse.json({ message: "assignment not found" }, { status: 404 });
-//     }
-
-//     // Remove this delivery boy from broadcastTo list
-//     assignment.broadcastTo = assignment.broadcastTo.filter(
-//       (id: any) => String(id) !== String(deliveryBoyId)
-//     );
-
-//     // If no more candidates, mark as failed
-//     if (assignment.broadcastTo.length === 0) {
-//       assignment.status = "failed";
-//     }
-
-//     await assignment.save();
-
-//     return NextResponse.json({ message: "order rejected" }, { status: 200 });
-//   } catch (error) {
-//     console.error("Reject error:", error);
-//     return NextResponse.json({ message: "reject assignment error" }, { status: 500 });
-//   }
-// }

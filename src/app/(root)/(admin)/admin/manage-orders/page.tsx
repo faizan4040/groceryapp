@@ -50,6 +50,22 @@ interface Order {
   updatedAt?:         string
 }
 
+// ── NEW: Delivery assignment shape after populate ─────────────────────────────
+interface Rider {
+  _id:    string
+  name?:  string
+  phone?: string
+  email?: string
+}
+
+interface DeliveryAssignment {
+  _id:           string
+  status:        'broadcasted' | 'assigned' | 'completed'
+  broadcastedTo: Rider[]
+  assignedTo:    Rider | null
+  acceptedAt?:   string
+}
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const ORDER_STATUSES = ['pending', 'confirmed', 'shipped', 'out for delivery', 'delivered', 'cancelled'] as const
@@ -70,6 +86,13 @@ const STATUS_CFG: Record<string, { bg: string; text: string; dot: string; label:
   'out for delivery': { bg: 'bg-violet-50',  text: 'text-violet-700',  dot: 'bg-violet-400',  label: 'Out for Delivery' },
   delivered:          { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-400', label: 'Delivered' },
   cancelled:          { bg: 'bg-red-50',     text: 'text-red-700',     dot: 'bg-red-400',     label: 'Cancelled' },
+}
+
+// ── NEW: Delivery assignment status config ────────────────────────────────────
+const DL_STATUS_CFG = {
+  broadcasted: { bg: 'bg-amber-50',   text: 'text-amber-700',   dot: 'bg-amber-400',   label: 'Broadcasted' },
+  assigned:    { bg: 'bg-blue-50',    text: 'text-blue-700',    dot: 'bg-blue-400',    label: 'Assigned'    },
+  completed:   { bg: 'bg-emerald-50', text: 'text-emerald-700', dot: 'bg-emerald-400', label: 'Completed'   },
 }
 
 // ─── Animated Status Tracker ──────────────────────────────────────────────────
@@ -257,10 +280,34 @@ const OrderModal = ({
   onClose: () => void
   onSave: (id: string, status: string, isPaid: boolean) => Promise<void>
 }) => {
-  const [status, setStatus] = useState(order.status)
-  const [isPaid, setIsPaid] = useState(order.isPaid)
-  const [saving, setSaving] = useState(false)
-  const [orders,setOrders] = useState<IOrder[]>()
+  const [status,      setStatus]      = useState(order.status)
+  const [isPaid,      setIsPaid]      = useState(order.isPaid)
+  const [saving,      setSaving]      = useState(false)
+  const [fullOrder,   setFullOrder]   = useState<any>(null)
+  const [dlLoading,   setDlLoading]   = useState(true)
+
+  // Fetch populated order (with assignment) when modal opens
+  useEffect(() => {
+    const fetchDetail = async () => {
+      setDlLoading(true)
+      try {
+        const { data } = await axios.get(`/api/admin/get-orders?orderId=${order._id}`)
+        if (data.success) setFullOrder(data.order)
+      } catch (err) {
+        console.error('Failed to fetch order detail', err)
+      } finally {
+        setDlLoading(false)
+      }
+    }
+    fetchDetail()
+  }, [order._id])
+
+  // Socket listener
+  useEffect((): any => {
+    const socket = getSocket()
+    socket?.on('new-order', (newOrder: any) => { console.log(newOrder) })
+    return () => socket?.off('new-order')
+  }, [])
 
   const handleSave = async () => {
     setSaving(true)
@@ -269,19 +316,13 @@ const OrderModal = ({
     onClose()
   }
 
-  useEffect(():any=>{
-    const socket=getSocket()
-    socket?.on("new-order",(newOrder)=>{
-      console.log(newOrder)
-      setOrders((prev)=>[newOrder,...prev!])
-    })
-    return ()=>socket.off("new-order")
-  },[])
+  const assignment: DeliveryAssignment | null = fullOrder?.assignment ?? null
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
       <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
 
+        {/* Header */}
         <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
           <div>
             <h2 className="text-lg font-bold text-gray-900">Order Details</h2>
@@ -319,7 +360,7 @@ const OrderModal = ({
           <div className="bg-gray-50 rounded-xl p-4">
             <div className="flex items-center gap-2 mb-2">
               <FiMapPin size={13} className="text-gray-400" />
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Delivery Address</p>  
+              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Delivery Address</p>
             </div>
             <p className="text-sm text-gray-700">{order.address.fullAddress}</p>
             {order.address.city && (
@@ -357,6 +398,7 @@ const OrderModal = ({
             </div>
           </div>
 
+          {/* Razorpay */}
           {order.razorpayOrderId && (
             <div className="bg-gray-50 rounded-xl p-4">
               <div className="flex items-center gap-2 mb-2">
@@ -369,6 +411,190 @@ const OrderModal = ({
               )}
             </div>
           )}
+
+          {/* ── Delivery Assignment ── */}
+          <div className="rounded-xl border border-gray-100 overflow-hidden">
+
+            {/* Section header */}
+            <div className="flex items-center justify-between px-4 py-3 bg-gray-50 border-b border-gray-100">
+              <div className="flex items-center gap-2">
+                <FiTruck size={13} className="text-gray-400" />
+                <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">Delivery Assignment</p>
+              </div>
+              {/* Show assignment status badge only when loaded and exists */}
+              {!dlLoading && assignment && (
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold
+                  ${DL_STATUS_CFG[assignment.status].bg} ${DL_STATUS_CFG[assignment.status].text}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${DL_STATUS_CFG[assignment.status].dot}`} />
+                  {DL_STATUS_CFG[assignment.status].label}
+                </span>
+              )}
+            </div>
+
+            <div className="p-4">
+
+              {/* ── Loading ── */}
+              {dlLoading ? (
+                <div className="flex items-center justify-center gap-2 py-8">
+                  <div className="w-5 h-5 border-2 border-gray-200 border-t-green-500 rounded-full animate-spin" />
+                  <span className="text-sm text-gray-400">Loading assignment…</span>
+                </div>
+
+              ) : !assignment ? (
+                /* ── Empty state ── */
+                <div className="flex flex-col items-center justify-center py-8 gap-3">
+                  <div className="relative">
+                    <div className="w-14 h-14 rounded-2xl bg-gray-100 flex items-center justify-center">
+                      <FiTruck size={22} className="text-gray-300" />
+                    </div>
+                    <div className="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-amber-100 flex items-center justify-center">
+                      <FiClock size={10} className="text-amber-500" />
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm font-bold text-gray-500">No assignments yet</p>
+                    <p className="text-xs text-gray-400 mt-1 leading-relaxed">
+                      New orders will appear here automatically
+                    </p>
+                  </div>
+                </div>
+
+              ) : (
+                /* ── Assignment found ── */
+                <div className="space-y-3">
+
+                  {/* Assigned Rider */}
+                  <div>
+                    <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Assigned Rider</p>
+                    {assignment.assignedTo ? (
+                      <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-xl border border-blue-100">
+                        <div className="w-9 h-9 rounded-full bg-blue-200 flex items-center justify-center text-blue-700 text-sm font-black shrink-0">
+                          {assignment.assignedTo.name?.[0]?.toUpperCase() ?? '?'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-bold text-gray-800">{assignment.assignedTo.name ?? 'Unknown'}</p>
+                          {assignment.assignedTo.phone && (
+                            <p className="text-xs text-gray-500 flex items-center gap-1 mt-0.5">
+                              <FiPhone size={10} /> {assignment.assignedTo.phone}
+                            </p>
+                          )}
+                        </div>
+                        <span className="text-[10px] bg-blue-100 text-blue-700 px-2 py-1 rounded-lg font-bold shrink-0">
+                          Assigned
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                        <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center shrink-0">
+                          <FiUser size={14} className="text-gray-300" />
+                        </div>
+                        <p className="text-xs text-gray-400">Waiting for a rider to accept…</p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Broadcasted To */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Broadcasted To</p>
+                      <span className="text-[10px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded-full font-semibold">
+                        {assignment.broadcastedTo?.length ?? 0} rider{(assignment.broadcastedTo?.length ?? 0) !== 1 ? 's' : ''}
+                      </span>
+                    </div>
+
+                    {!assignment.broadcastedTo?.length ? (
+                      <div className="flex flex-col items-center justify-center py-6 gap-2 bg-gray-50 rounded-xl border border-dashed border-gray-200">
+                        <div className="w-10 h-10 rounded-full bg-white border border-gray-200 flex items-center justify-center">
+                          <FiUser size={14} className="text-gray-300" />
+                        </div>
+                        <p className="text-xs font-semibold text-gray-400">No riders broadcasted</p>
+                        <p className="text-[10px] text-gray-300 text-center max-w-48 leading-relaxed">
+                          No available riders were found nearby when this order was placed
+                        </p>
+                      </div>
+                    ) : (
+                      // <div className="space-y-2 max-h-44 overflow-y-auto pr-0.5">
+                      //   {assignment.broadcastedTo.map((rider) => {
+                      //     const isAssigned = assignment.assignedTo?._id === rider._id
+                      //     return (
+                      //       <div
+                      //         key={rider._id}
+                      //         className={`flex items-center gap-2.5 p-2.5 rounded-xl transition-colors ${isAssigned ? 'bg-blue-50 border border-blue-100' : 'bg-gray-50'}`}
+                      //       >
+                      //         <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${isAssigned ? 'bg-blue-200 text-blue-700' : 'bg-gray-200 text-gray-500'}`}>
+                      //           {rider.name?.[0]?.toUpperCase() ?? '?'}
+                      //         </div>
+                      //         <div className="flex-1 min-w-0">
+                      //           <p className="text-xs font-semibold text-gray-700 truncate">{rider.name ?? 'Rider'}</p>
+                      //           {rider.phone && <p className="text-[10px] text-gray-400">{rider.phone}</p>}
+                      //         </div>
+                      //         {isAssigned && (
+                      //           <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-md font-bold shrink-0">
+                      //             Assigned
+                      //           </span>
+                      //         )}
+                      //       </div>
+                      //     )
+                      //   })}
+                      // </div>
+                      <div className="space-y-2 max-h-44 overflow-y-auto pr-0.5">
+  {assignment.broadcastedTo.map((rider: any, index: number) => {
+    // Handle both cases (object OR string)
+    const riderId = typeof rider === 'string' ? rider : rider?._id
+    const riderName = typeof rider === 'string' ? 'Rider' : rider?.name
+    const riderPhone = typeof rider === 'string' ? null : rider?.phone
+
+    const isAssigned =
+      (typeof assignment.assignedTo === 'string'
+        ? assignment.assignedTo
+        : assignment.assignedTo?._id) === riderId
+
+    return (
+      <div
+        key={`${riderId}-${index}`} // always unique
+        className={`flex items-center gap-2.5 p-2.5 rounded-xl transition-colors ${
+          isAssigned ? 'bg-blue-50 border border-blue-100' : 'bg-gray-50'
+        }`}
+      >
+        <div
+          className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-black shrink-0 ${
+            isAssigned ? 'bg-blue-200 text-blue-700' : 'bg-gray-200 text-gray-500'
+          }`}
+        >
+          {riderName?.[0]?.toUpperCase() ?? '?'}
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-semibold text-gray-700 truncate">
+            {riderName ?? 'Rider'}
+          </p>
+          {riderPhone && (
+            <p className="text-[10px] text-gray-400">{riderPhone}</p>
+          )}
+        </div>
+
+        {isAssigned && (
+          <span className="text-[9px] bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded-md font-bold shrink-0">
+            Assigned
+          </span>
+        )}
+      </div>
+    )
+  })}
+</div>
+                    )}
+                  </div>
+
+                  {/* Accepted at */}
+                  {assignment.acceptedAt && (
+                    <p className="text-[10px] text-gray-400 text-right font-mono">
+                      Accepted: {new Date(assignment.acceptedAt).toLocaleString('en-IN')}
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
 
           {/* Controls */}
           <div className="grid grid-cols-2 gap-4">
@@ -403,6 +629,7 @@ const OrderModal = ({
               {saving ? 'Saving…' : 'Save Changes'}
             </button>
           </div>
+
         </div>
       </div>
     </div>
@@ -447,7 +674,7 @@ const ManageOrders = () => {
   const [filterStatus,  setFilterStatus]  = useState('all')
   const [filterPayment, setFilterPayment] = useState('all')
   const [searchInput,   setSearchInput]   = useState('')
-  const [searchQuery,   setSearchQuery]   = useState('')   // applied on click / Enter
+  const [searchQuery,   setSearchQuery]   = useState('')
 
   // Client-side pagination
   const [currentPage, setCurrentPage] = useState(1)
@@ -462,7 +689,6 @@ const ManageOrders = () => {
     setTimeout(() => setToast(null), 3000)
   }
 
-  // ── Fetch all orders (large limit) ────────────────────────────────────────
   const fetchOrders = async () => {
     setLoading(true)
     setError(null)
@@ -482,16 +708,11 @@ const ManageOrders = () => {
 
   useEffect(() => { fetchOrders() }, [])
 
-  // ── Client-side filter + search (instant, always correct) ────────────────
   const filtered = useMemo(() => {
     let list = [...allOrders]
-
-    if (filterStatus !== 'all')
-      list = list.filter(o => o.status === filterStatus)
-
+    if (filterStatus !== 'all') list = list.filter(o => o.status === filterStatus)
     if (filterPayment === 'paid')   list = list.filter(o => o.isPaid)
     if (filterPayment === 'unpaid') list = list.filter(o => !o.isPaid)
-
     const q = searchQuery.trim().toLowerCase()
     if (q) {
       list = list.filter(o =>
@@ -502,11 +723,9 @@ const ManageOrders = () => {
         o.items.some(i => i.name.toLowerCase().includes(q))
       )
     }
-
     return list
   }, [allOrders, filterStatus, filterPayment, searchQuery])
 
-  // Reset page when filters change
   useEffect(() => { setCurrentPage(1) }, [filterStatus, filterPayment, searchQuery])
 
   const totalPages  = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
@@ -520,7 +739,6 @@ const ManageOrders = () => {
 
   const hasActiveFilter = filterStatus !== 'all' || filterPayment !== 'all' || searchQuery !== ''
 
-  // ── Mutations ─────────────────────────────────────────────────────────────
   const handleUpdateOrder = async (id: string, status: string, isPaid: boolean) => {
     try {
       const { data } = await axios.put('/api/admin/update-order', { orderId: id, status, isPaid })
@@ -541,7 +759,6 @@ const ManageOrders = () => {
     } catch { showToast('Failed to delete order', 'error') }
   }
 
-  // ── Stats (reflect current filtered view) ─────────────────────────────────
   const stats = [
     { label: 'Showing',   value: filtered.length,                                                           icon: <FiPackage size={18} />,     color: 'bg-blue-50 text-blue-600' },
     { label: 'Delivered', value: filtered.filter(o => o.status === 'delivered').length,                     icon: <FiCheckCircle size={18} />, color: 'bg-emerald-50 text-emerald-600' },
@@ -549,7 +766,6 @@ const ManageOrders = () => {
     { label: 'Revenue',   value: `₹${filtered.reduce((s, o) => s + (o.totalAmount || 0), 0).toFixed(0)}`,  icon: <FiDollarSign size={18} />,  color: 'bg-violet-50 text-violet-600' },
   ]
 
-  // ── Pagination page numbers ────────────────────────────────────────────────
   const pageNums = (() => {
     const pages: number[] = []
     const start = Math.max(1, safePage - 2)
@@ -597,7 +813,6 @@ const ManageOrders = () => {
 
           {/* ── Filters ── */}
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex flex-col sm:flex-row gap-3 flex-wrap">
-            {/* Search */}
             <div className="flex gap-2 flex-1 min-w-0">
               <div className="relative flex-1 min-w-0">
                 <FiSearch size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
@@ -620,35 +835,22 @@ const ManageOrders = () => {
               </button>
             </div>
 
-            {/* Status filter */}
-        <Select
-        value={filterStatus}
-        onValueChange={(value) => setFilterStatus(value)}
-      >
-        <SelectTrigger className="w-45 border border-gray-200 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 focus:ring-2 focus:ring-green-400 bg-gray-50">
-          <SelectValue placeholder="Select Status" />
-        </SelectTrigger>
+            <Select value={filterStatus} onValueChange={(value) => setFilterStatus(value)}>
+              <SelectTrigger className="w-45 border border-gray-200 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 focus:ring-2 focus:ring-green-400 bg-gray-50">
+                <SelectValue placeholder="Select Status" />
+              </SelectTrigger>
+              <SelectContent className="rounded-xl">
+                <SelectItem value="all">All Statuses</SelectItem>
+                {ORDER_STATUSES.map((s) => (
+                  <SelectItem key={s} value={s}>{STATUS_CFG[s]?.label ?? s}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
-        <SelectContent className="rounded-xl">
-          <SelectItem value="all">All Statuses</SelectItem>
-
-          {ORDER_STATUSES.map((s) => (
-            <SelectItem key={s} value={s}>
-              {STATUS_CFG[s]?.label ?? s}
-            </SelectItem>
-          ))}
-          </SelectContent>
-        </Select>
-
-            {/* Payment filter */}
-            <Select
-              value={filterPayment}
-              onValueChange={(value) => setFilterPayment(value)}
-            >
+            <Select value={filterPayment} onValueChange={(value) => setFilterPayment(value)}>
               <SelectTrigger className="w-45 cursor-pointer border border-gray-200 rounded-xl px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50">
                 <SelectValue placeholder="Select Payment" />
               </SelectTrigger>
-
               <SelectContent className="rounded-xl">
                 <SelectGroup>
                   <SelectItem value="all">All Payments</SelectItem>
@@ -658,12 +860,8 @@ const ManageOrders = () => {
               </SelectContent>
             </Select>
 
-            {/* Clear all */}
             {hasActiveFilter && (
-              <button
-                onClick={clearAll}
-                className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 text-red-500 text-xs font-semibold hover:bg-red-100 transition-colors whitespace-nowrap"
-              >
+              <button onClick={clearAll} className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-red-50 text-red-500 text-xs font-semibold hover:bg-red-100 transition-colors whitespace-nowrap">
                 <FiX size={12} /> Clear All
               </button>
             )}
@@ -728,46 +926,30 @@ const ManageOrders = () => {
                     <tbody className="divide-y divide-gray-50">
                       {pageOrders.map((order) => (
                         <tr key={order._id} className="hover:bg-gray-50/60 transition-colors">
-
-                          {/* Products — images + item count + mini order ID */}
                           <td className="px-4 py-3.5">
                             <ProductImages items={order.items} />
                             <span className="font-mono text-[9px] text-gray-300 mt-0.5 block">#{order._id.slice(-8)}</span>
                           </td>
-
-                          {/* Customer */}
                           <td className="px-4 py-3.5">
                             <p className="text-sm font-semibold text-gray-800">{order.address.fullName}</p>
                             <p className="text-xs text-gray-400">{order.address.mobile}</p>
                           </td>
-
-                          {/* Amount */}
                           <td className="px-4 py-3.5">
                             <span className="text-sm font-bold text-gray-900">₹{order.totalAmount.toFixed(2)}</span>
                           </td>
-
-                          {/* Status */}
                           <td className="px-4 py-3.5"><StatusBadge status={order.status} /></td>
-
-                          {/* Payment */}
                           <td className="px-4 py-3.5">
                             <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${order.isPaid ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700'}`}>
                               <span className={`w-1.5 h-1.5 rounded-full ${order.isPaid ? 'bg-emerald-400' : 'bg-amber-400'}`} />
                               {order.isPaid ? 'Paid' : 'Unpaid'}
                             </span>
                           </td>
-
-                          {/* Method */}
                           <td className="px-4 py-3.5">
                             <span className="text-xs text-gray-500 uppercase font-semibold bg-gray-100 px-2 py-1 rounded-lg">{order.paymentMethod}</span>
                           </td>
-
-                          {/* Date */}
                           <td className="px-4 py-3.5 text-xs text-gray-400 whitespace-nowrap">
                             {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}
                           </td>
-
-                          {/* Actions */}
                           <td className="px-4 py-3.5">
                             <div className="flex items-center gap-1.5">
                               <button onClick={() => setSelectedOrder(order)} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 text-xs font-semibold hover:bg-blue-100 transition-colors">
@@ -859,3 +1041,4 @@ const ManageOrders = () => {
 }
 
 export default ManageOrders
+

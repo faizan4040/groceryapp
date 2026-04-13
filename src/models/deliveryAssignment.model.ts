@@ -1,34 +1,60 @@
-// models/deliveryAssignment.model.ts
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose from "mongoose"
 
-export interface IDeliveryAssignment extends Document {
-  order: mongoose.Types.ObjectId;
-  deliveryBoy: mongoose.Types.ObjectId | null;
-  status: "broadcasted" | "accepted" | "delivered" | "failed";
-  rejectedBy: mongoose.Types.ObjectId[];
-  createdAt: Date;
-  updatedAt: Date;
+export interface IDeliveryAssignment {
+  _id?: mongoose.Types.ObjectId
+  order: mongoose.Types.ObjectId
+  broadcastedTo: string[] 
+  assignedTo: string | null 
+  status: "broadcasted" | "assigned" | "completed" | "failed"
+  rejectedBy?: string[] 
+  acceptedAt?: Date
+  createdAt?: Date
+  updatedAt?: Date
 }
 
-const DeliveryAssignmentSchema = new Schema<IDeliveryAssignment>(
+const deliveryAssignmentSchema = new mongoose.Schema<IDeliveryAssignment>(
   {
-    order: { type: Schema.Types.ObjectId, ref: "Order", required: true },
-    deliveryBoy: { type: Schema.Types.ObjectId, ref: "User", default: null },
+    order: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Order",
+      required: true,
+    },
+
+    broadcastedTo: [
+      {
+        type: String, 
+      },
+    ],
+
+    assignedTo: {
+      type: String, 
+      default: null,
+    },
+
     status: {
       type: String,
-      enum: ["broadcasted", "accepted", "delivered", "failed"],
+      enum: ["broadcasted", "assigned", "completed", "failed"], 
       default: "broadcasted",
     },
-    rejectedBy: [{ type: Schema.Types.ObjectId, ref: "User" }],
+
+    rejectedBy: [
+      {
+        type: String, 
+      },
+    ],
+
+    acceptedAt: {
+      type: Date,
+    },
   },
   { timestamps: true }
-);
+)
 
-const DeliveryAssignment: Model<IDeliveryAssignment> =
+const DeliveryAssignment =
   mongoose.models.DeliveryAssignment ||
-  mongoose.model<IDeliveryAssignment>("DeliveryAssignment", DeliveryAssignmentSchema);
+  mongoose.model("DeliveryAssignment", deliveryAssignmentSchema)
 
-export default DeliveryAssignment;
+export default DeliveryAssignment
 
 
 

@@ -23,8 +23,8 @@ export const getSocket = (): Socket => {
       reconnectionDelay: 1000,
     });
 
-    // avoid duplicate listeners in dev
-    socket.removeAllListeners();
+
+    // socket.removeAllListeners();
 
     socket.on("connect", () => {
       console.log("Connected:", socket?.id);
