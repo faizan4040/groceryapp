@@ -130,7 +130,7 @@ export default function StockOrders() {
     }
     setSavingId(id)
     try {
-      await axios.patch(`/api/admin/add-grocery/${id}`, {
+      await axios.patch(`/api/admin/stock-orders/${id}`, {
         stock: Number(editStock),
         price: editPrice ? Number(editPrice) : undefined,
       })
@@ -151,7 +151,7 @@ export default function StockOrders() {
   /* ── delete ── */
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`/api/admin/add-grocery/${id}`)
+      await axios.delete(`/api/admin/stock-orders/${id}`)
       setItems(prev => prev.filter(i => i._id !== id))
       setDeleteId(null)
       showToast("Item deleted", "success")
