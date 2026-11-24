@@ -257,7 +257,7 @@ const handleCoupon = async () => {
       grocery:  String(item._id),
       name:     item.name,
       price:    Number(item.price),
-      unit:     item.unit || "unit",
+      unit:     item.variant || item.unit || "unit",
       quantity: item.quantity,
       image:    item.image || '',
     })),

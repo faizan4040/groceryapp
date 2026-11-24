@@ -7,7 +7,14 @@ export interface ICartItem {
   price: number
   image: string
   quantity: number
+  /** pack size label, e.g. "100 g" — set when the product has variants */
+  variant?: string
+  /** unique line id: `${_id}` or `${_id}::${variant}` */
+  cartKey?: string
 }
+
+/** The id that identifies one cart line (product + pack size). */
+export const lineKey = (item: Pick<ICartItem, "_id" | "cartKey">) => item.cartKey ?? item._id
 
 interface ICartState {
   cartData: ICartItem[]
@@ -37,44 +44,41 @@ const cartSlice = createSlice({
   reducers: {
 
     addToCart: (state, action: PayloadAction<ICartItem>) => {
-      const existing = state.cartData.find(
-        (item) => item._id === action.payload._id
-      )
+      const key = lineKey(action.payload)
+      const existing = state.cartData.find((item) => lineKey(item) === key)
+      const qty = Math.max(1, action.payload.quantity || 1)
 
       if (existing) {
-        existing.quantity += 1
+        existing.quantity += qty
       } else {
-        state.cartData.push({
-          ...action.payload,
-          quantity: 1
-        })
+        state.cartData.push({ ...action.payload, cartKey: key, quantity: qty })
       }
 
-      saveCart(state.cartData) 
+      saveCart(state.cartData)
     },
 
     removeFromCart: (state, action: PayloadAction<string>) => {
       state.cartData = state.cartData.filter(
-        (item) => item._id !== action.payload
+        (item) => lineKey(item) !== action.payload
       )
 
       saveCart(state.cartData) 
     },
 
     increaseQty: (state, action: PayloadAction<string>) => {
-      const item = state.cartData.find(i => i._id === action.payload)
+      const item = state.cartData.find(i => lineKey(i) === action.payload)
       if (item) item.quantity += 1
 
       saveCart(state.cartData) 
     },
 
     decreaseQty: (state, action: PayloadAction<string>) => {
-      const item = state.cartData.find(i => i._id === action.payload)
+      const item = state.cartData.find(i => lineKey(i) === action.payload)
 
       if (item) {
         if (item.quantity === 1) {
           state.cartData = state.cartData.filter(
-            i => i._id !== action.payload
+            i => lineKey(i) !== action.payload
           )
         } else {
           item.quantity -= 1

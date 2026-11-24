@@ -1,88 +1,163 @@
 'use client'
 
-import React, { useState, useRef, useEffect } from 'react'
-import mongoose from 'mongoose'
+import React, { useState, useRef, useEffect, useMemo } from 'react'
 import {
-  ShoppingCart, User, Search, Box, LogOut,
-  LocateFixed, MapPin, X, Loader2, Menu,
-  PlusCircle, List, ClipboardList,
+  ShoppingBag, User, Search, Box, LogOut, LocateFixed, MapPin, X, Loader2,
+  Menu, ChevronDown, Truck, HelpCircle, ArrowRight,
 } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { usePathname, useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import { motion, AnimatePresence } from 'motion/react'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/redux/store'
 import CartSidebar from '@/app/user/cartsidebar/page'
+import { SPICE_CATEGORIES, SpiceArt } from '@/components/SpiceArt'
+import Logo from '@/components/BrandLogo'
 
+/* ─────────────────────────── types & constants ─────────────────────────── */
 
-interface IUser {
-  _id: mongoose.Types.ObjectId
+interface NavUser {
+  _id: unknown
   name: string
   email: string
-  password?: string
-  mobile: string
+  mobile?: string
   role: 'user' | 'deliveryBoy' | 'admin'
   image?: string
 }
 
+interface SearchProduct {
+  _id: string
+  name: string
+  category?: string
+  price?: number
+  unit?: string
+  image?: string
+}
 
-const Navbar = ({ user }: { user?: IUser }) => {
-  const [open, setOpen] = useState(false)
-  const [locationOpen, setLocationOpen] = useState(false)
-  const [location, setLocation] = useState('Select your location')
-  const [detecting, setDetecting] = useState(false)
-  const [sidebarOpen, setSidebarOpen] = useState(false)
-  const [cartOpen, setCartOpen] = useState(false) 
+const NAV_LINKS = [
+  { label: 'Home', href: '/' },
+  { label: 'Shop', href: '/#shop', dropdown: true },
+  { label: 'Recipes', href: '/blog' },
+  { label: 'About', href: '/aboutus' },
+  { label: 'Contact', href: '/contactus' },
+]
 
-  const dropdownRef = useRef<HTMLDivElement>(null)
-  const locationRef = useRef<HTMLDivElement>(null)
+const DEFAULT_LOCATION = 'Select your location'
 
+/* ─────────────────────────────── Search ─────────────────────────────── */
+
+function SearchBox({ autoFocus = false, onNavigate }: { autoFocus?: boolean; onNavigate?: () => void }) {
+  const router = useRouter()
   const [query, setQuery] = useState('')
-  const [results, setResults] = useState<any[]>([])
-  const [mounted, setMounted] = useState(false)
+  const [products, setProducts] = useState<SearchProduct[] | null>(null)
+  const [loading, setLoading] = useState(false)
 
-useEffect(() => {
-  setMounted(true)
-}, [])
-
-  const cartItems = useSelector((state: RootState) => state.cart.cartData)
-  const totalItems = cartItems.reduce((total, item) => total + (item.quantity || 1), 0)
-
-  /* ── load saved location ── */
-  useEffect(() => {
-    const saved = localStorage.getItem('deliveryLocation')
-    if (saved) setLocation(saved)
-  }, [])
-
-  /* ── close dropdowns on outside click ── */
-  useEffect(() => {
-    const handleClick = (e: MouseEvent) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) setOpen(false)
-      if (locationRef.current && !locationRef.current.contains(e.target as Node)) setLocationOpen(false)
+  const ensureProducts = async () => {
+    if (products || loading) return
+    setLoading(true)
+    try {
+      const res = await fetch('/api/products')
+      const data = await res.json()
+      setProducts(Array.isArray(data) ? data : [])
+    } catch {
+      setProducts([])
+    } finally {
+      setLoading(false)
     }
-    document.addEventListener('mousedown', handleClick)
-    return () => document.removeEventListener('mousedown', handleClick)
-  }, [])
-
-  /* ── prevent body scroll when any overlay open ── */
-  useEffect(() => {
-    const anyOpen = sidebarOpen || cartOpen
-    document.body.style.overflow = anyOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
-  }, [sidebarOpen, cartOpen])
-
-  /* ── save location helper ── */
-  const saveLocation = (address: string) => {
-    localStorage.setItem('deliveryLocation', address)
-    setLocation(address)
-    setLocationOpen(false)
-    setQuery('')
-    setResults([])
   }
 
-  /* ── GPS detect ── */
-  const detectLocation = () => {
+  useEffect(() => { if (autoFocus) ensureProducts() }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const results = useMemo(() => {
+    const q = query.trim().toLowerCase()
+    if (!q || !products) return []
+    return products
+      .filter((p) => p.name?.toLowerCase().includes(q) || p.category?.toLowerCase().includes(q))
+      .slice(0, 6)
+  }, [query, products])
+
+  const go = (id: string) => {
+    setQuery('')
+    onNavigate?.()
+    router.push(`/products/${id}`)
+  }
+
+  return (
+    <div className="relative">
+      <form
+        onSubmit={(e) => { e.preventDefault(); if (results[0]) go(results[0]._id) }}
+        className="flex items-center bg-white rounded-full border border-brown-200 focus-within:border-red-500 focus-within:ring-4 focus-within:ring-red-500/15 transition"
+      >
+        <Search size={18} className="ml-4 text-neutral-400 shrink-0" />
+        <input
+          type="text"
+          value={query}
+          autoFocus={autoFocus}
+          onChange={(e) => setQuery(e.target.value)}
+          onFocus={ensureProducts}
+          placeholder="Search garam masala, haldi, lal mirch…"
+          className="flex-1 min-w-0 bg-transparent py-3 px-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:outline-none"
+          aria-label="Search products"
+        />
+        {query && (
+          <button type="button" onClick={() => setQuery('')} className="p-1 mr-1 text-neutral-400 hover:text-neutral-700" aria-label="Clear search">
+            <X size={16} />
+          </button>
+        )}
+        <button type="submit" className="m-1 px-5 py-2.5 rounded-full bg-red-600 hover:bg-red-700 text-white text-sm font-semibold transition cursor-pointer">
+          Search
+        </button>
+      </form>
+
+      {query.trim() && (
+        <div className="mt-2 bg-white rounded-2xl border border-brown-100 shadow-xl overflow-hidden">
+          {loading && (
+            <div className="flex items-center gap-2 px-4 py-4 text-sm text-neutral-500">
+              <Loader2 size={16} className="animate-spin text-red-600" /> Searching…
+            </div>
+          )}
+          {!loading && results.length === 0 && (
+            <p className="px-4 py-4 text-sm text-neutral-500">No masala found for “{query}”.</p>
+          )}
+          {!loading && results.map((p) => (
+            <button
+              key={p._id}
+              onClick={() => go(p._id)}
+              className="flex items-center gap-3 w-full px-4 py-2.5 text-left hover:bg-brown-50 transition cursor-pointer"
+            >
+              <span className="w-11 h-11 rounded-lg bg-brown-50 overflow-hidden shrink-0 isolate">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {p.image && <img src={p.image} alt="" className="w-full h-full object-contain mix-blend-multiply" />}
+              </span>
+              <span className="flex-1 min-w-0">
+                <span className="block text-sm font-semibold text-neutral-900 truncate">{p.name}</span>
+                <span className="block text-xs text-neutral-500 capitalize truncate">{p.category}{p.unit ? ` · ${p.unit}` : ''}</span>
+              </span>
+              {p.price != null && <span className="text-sm font-bold text-red-600">₹{p.price}</span>}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+/* ──────────────────────────── Location picker ──────────────────────────── */
+
+function LocationPicker({ location, onSave }: { location: string; onSave: (address: string) => void }) {
+  const [open, setOpen] = useState(false)
+  const [detecting, setDetecting] = useState(false)
+  const [query, setQuery] = useState('')
+  const [results, setResults] = useState<any[]>([])
+
+  const save = (address: string) => {
+    onSave(address)
+    setOpen(false); setQuery(''); setResults([])
+  }
+
+  const detect = () => {
     if (!navigator.geolocation) { alert('Geolocation not supported by your browser.'); return }
     setDetecting(true)
     navigator.geolocation.getCurrentPosition(
@@ -91,383 +166,417 @@ useEffect(() => {
         try {
           const res = await fetch(`/api/reverse-location?lat=${latitude}&lon=${longitude}`)
           const data = await res.json()
-          saveLocation(data.display_name)
+          if (data?.display_name) save(data.display_name)
         } catch (err) {
           console.error('Location detect error:', err)
         } finally { setDetecting(false) }
       },
-      () => { setDetecting(false); alert('Could not retrieve your location. Please allow location access.') }
+      () => { setDetecting(false); alert('Could not retrieve your location. Please allow location access.') },
     )
   }
 
-  /* ── search locations ── */
-  const searchLocation = async (value: string) => {
+  const search = async (value: string) => {
     setQuery(value)
     if (value.length < 3) { setResults([]); return }
     try {
       const res = await fetch(`/api/location?q=${encodeURIComponent(value)}`)
       const data = await res.json()
-      setResults(data)
+      setResults(Array.isArray(data) ? data : [])
     } catch (err) { console.error('Search error:', err) }
   }
 
-  const shortLocation = location === 'Select your location'
-    ? location
-    : location.split(',').slice(0, 2).join(', ')
+  const short = location === DEFAULT_LOCATION ? location : location.split(',').slice(0, 2).join(', ')
 
-  const isAdmin = user?.role === 'admin'
+  return (
+    <div>
+      <button
+        onClick={() => setOpen((p) => !p)}
+        className="flex items-center gap-2 text-left text-sm cursor-pointer"
+        aria-expanded={open}
+      >
+        <MapPin size={16} className="text-red-600 shrink-0" />
+        <span className="text-neutral-500">Deliver to</span>
+        <span className="font-semibold text-neutral-900 truncate max-w-52">{short}</span>
+        <ChevronDown size={14} className={`shrink-0 text-neutral-500 transition ${open ? 'rotate-180' : ''}`} />
+      </button>
 
-  const isDeliveryBoy = user?.role === 'deliveryBoy'
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="pt-3 space-y-2.5">
+              <button
+                onClick={detect} disabled={detecting}
+                className="flex items-center gap-3 w-full p-3 rounded-xl bg-red-50 hover:bg-red-100 transition disabled:opacity-60 cursor-pointer"
+              >
+                {detecting ? <Loader2 size={18} className="text-red-600 animate-spin" /> : <LocateFixed size={18} className="text-red-600" />}
+                <span className="font-semibold text-sm text-neutral-900">{detecting ? 'Detecting…' : 'Use my current location'}</span>
+              </button>
+              <input
+                value={query}
+                onChange={(e) => search(e.target.value)}
+                placeholder="Or search area, street, city…"
+                className="w-full border border-brown-200 rounded-xl py-2.5 px-3 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-red-300"
+              />
+              {results.length > 0 && (
+                <div className="max-h-48 overflow-y-auto rounded-xl border border-brown-100 bg-white divide-y divide-brown-50">
+                  {results.map((item: any) => (
+                    <button key={item.place_id} onClick={() => save(item.display_name)} className="flex items-start gap-2.5 w-full text-left px-3 py-2.5 hover:bg-brown-50 transition cursor-pointer">
+                      <MapPin size={14} className="mt-0.5 shrink-0 text-red-500" />
+                      <span className="text-sm text-neutral-700 leading-snug">{item.display_name}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  )
+}
 
+/* ───────────────────────────────── Avatar ───────────────────────────────── */
 
+function Avatar({ user, size = 36 }: { user: NavUser | null; size?: number }) {
+  return (
+    <span
+      className="rounded-full overflow-hidden bg-red-600 text-white flex items-center justify-center shrink-0"
+      style={{ width: size, height: size }}
+    >
+      {user?.image
+        ? <Image src={user.image} alt={user.name} width={size} height={size} className="object-cover w-full h-full" />
+        : user?.name
+          ? <span className="text-sm font-bold">{user.name.charAt(0).toUpperCase()}</span>
+          : <User size={size * 0.5} />}
+    </span>
+  )
+}
+
+/* ───────────────────────────────── Navbar ───────────────────────────────── */
+
+/**
+ * @param overlay  true on the home page: the header floats transparent over the
+ *                 hero video and turns solid black once the page is scrolled.
+ */
+const Navbar = ({ user, overlay = false }: { user?: NavUser; overlay?: boolean }) => {
+  const pathname = usePathname()
+  const reduxUser = useSelector((state: RootState) => state.user.userData)
+  const currentUser: NavUser | null = (user as NavUser) ?? (reduxUser as NavUser | null) ?? null
+
+  const [accountOpen, setAccountOpen] = useState(false)
+  const [shopOpen, setShopOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const [cartOpen, setCartOpen] = useState(false)
+  const [location, setLocation] = useState(DEFAULT_LOCATION)
+  const [mounted, setMounted] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+  const accountRef = useRef<HTMLDivElement>(null)
+  const shopRef = useRef<HTMLLIElement>(null)
+
+  const cartItems = useSelector((state: RootState) => state.cart.cartData)
+  const totalItems = cartItems.reduce((total, item) => total + (item.quantity || 1), 0)
+
+  const isAdmin = currentUser?.role === 'admin'
+  const isDeliveryBoy = currentUser?.role === 'deliveryBoy'
+
+  useEffect(() => {
+    setMounted(true)
+    try {
+      const saved = localStorage.getItem('deliveryLocation')
+      if (saved) setLocation(saved)
+    } catch { /* storage unavailable */ }
+  }, [])
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 40)
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
+  useEffect(() => {
+    const onClick = (e: MouseEvent) => {
+      if (accountRef.current && !accountRef.current.contains(e.target as Node)) setAccountOpen(false)
+      if (shopRef.current && !shopRef.current.contains(e.target as Node)) setShopOpen(false)
+    }
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') { setSearchOpen(false); setAccountOpen(false); setShopOpen(false); setDrawerOpen(false) }
+    }
+    document.addEventListener('mousedown', onClick)
+    document.addEventListener('keydown', onKey)
+    return () => { document.removeEventListener('mousedown', onClick); document.removeEventListener('keydown', onKey) }
+  }, [])
+
+  useEffect(() => { setDrawerOpen(false); setAccountOpen(false); setShopOpen(false); setSearchOpen(false) }, [pathname])
+
+  useEffect(() => {
+    document.body.style.overflow = drawerOpen || cartOpen ? 'hidden' : ''
+    return () => { document.body.style.overflow = '' }
+  }, [drawerOpen, cartOpen])
+
+  const saveLocation = (address: string) => {
+    try { localStorage.setItem('deliveryLocation', address) } catch { /* ignore */ }
+    setLocation(address)
+  }
+
+  const isActive = (href: string) => (href === '/' ? pathname === '/' : !href.startsWith('/#') && pathname.startsWith(href))
+  const roleLabel = currentUser?.role === 'deliveryBoy' ? 'Delivery Partner' : currentUser?.role
+
+  // admins have their own panel header
+  if (isAdmin) return <CartSidebar open={cartOpen} onClose={() => setCartOpen(false)} />
+
+  const solid = !overlay || scrolled || searchOpen
+  const iconBtn = 'relative w-10 h-10 rounded-full flex items-center justify-center text-white/90 hover:text-white hover:bg-white/10 transition cursor-pointer'
 
   return (
     <>
-      {/* ── Cart Sidebar ───────────────────────────────────────────────── */}
       <CartSidebar open={cartOpen} onClose={() => setCartOpen(false)} />
 
-      {/* ── Mobile Nav Sidebar ─────────────────────────────────────────── */}
+      {/* ── Header ───────────────────────────────────────────────────── */}
+      <header
+        className={`${overlay ? 'fixed' : 'sticky'} top-0 inset-x-0 z-50 transition-all duration-300 ${
+          solid ? 'bg-neutral-950/95 backdrop-blur-md shadow-lg shadow-black/20' : 'bg-transparent'
+        }`}
+      >
+        <div className={`w-[95%] max-w-[1600px] mx-auto px-2 flex items-center gap-4 transition-all duration-300 ${solid ? 'h-16 md:h-[72px]' : 'h-18 md:h-24'}`}>
+          <Logo />
+
+          {/* centre nav — desktop */}
+          <ul className="hidden lg:flex items-center gap-1 xl:gap-3 mx-auto">
+            {NAV_LINKS.map((l) => {
+              const active = isActive(l.href)
+              const cls = `relative flex items-center gap-1 px-3 py-2 text-[15px] font-medium transition ${active ? 'text-white' : 'text-white/75 hover:text-white'}`
+              const underline = active && <span className="absolute left-3 right-3 -bottom-0.5 h-0.5 rounded-full bg-red-600" />
+
+              if (l.dropdown) {
+                return (
+                  <li key={l.label} ref={shopRef} className="relative">
+                    <button onClick={() => setShopOpen((o) => !o)} className={`${cls} cursor-pointer`} aria-expanded={shopOpen}>
+                      {l.label} <ChevronDown size={15} className={`transition ${shopOpen ? 'rotate-180' : ''}`} />
+                    </button>
+                    <AnimatePresence>
+                      {shopOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
+                          transition={{ duration: 0.18 }}
+                          className="absolute left-1/2 -translate-x-1/2 top-full mt-4 w-[520px] bg-brown-50 rounded-2xl shadow-2xl p-3 grid grid-cols-3 gap-1"
+                        >
+                          {SPICE_CATEGORIES.map((c) => (
+                            <Link key={c.name} href={c.href} onClick={() => setShopOpen(false)} className="flex flex-col items-center gap-1.5 p-3 rounded-xl hover:bg-white transition">
+                              <span className="w-16 h-10">{c.image ? <img src={c.image} alt="" className="w-full h-full object-contain" /> : <SpiceArt kind={c.kind} colors={c.colors} id={`nav-${c.name}`} />}</span>
+                              <span className="text-xs font-semibold text-neutral-800 text-center">{c.name}</span>
+                            </Link>
+                          ))}
+                          <Link href="/#shop" onClick={() => setShopOpen(false)} className="col-span-3 mt-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-neutral-950 hover:bg-red-600 text-white text-sm font-semibold transition">
+                            Shop all products <ArrowRight size={15} />
+                          </Link>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </li>
+                )
+              }
+              return (
+                <li key={l.label}>
+                  <Link href={l.href} className={cls}>{l.label}{underline}</Link>
+                </li>
+              )
+            })}
+          </ul>
+
+          {/* right icons */}
+          <div className="ml-auto lg:ml-0 flex items-center gap-0.5 md:gap-1.5">
+            {!isDeliveryBoy && (
+              <button onClick={() => setSearchOpen((o) => !o)} className={iconBtn} aria-label={searchOpen ? 'Close search' : 'Open search'}>
+                {searchOpen ? <X size={21} /> : <Search size={21} />}
+              </button>
+            )}
+
+            <div ref={accountRef} className="relative hidden sm:block">
+              {currentUser ? (
+                <button onClick={() => setAccountOpen((p) => !p)} className={iconBtn} aria-label="Account menu">
+                  <Avatar user={currentUser} size={30} />
+                </button>
+              ) : (
+                <Link href="/login" className={iconBtn} aria-label="Login">
+                  <User size={21} />
+                </Link>
+              )}
+
+              <AnimatePresence>
+                {accountOpen && currentUser && (
+                  <motion.div
+                    initial={{ y: 8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 8, opacity: 0 }}
+                    transition={{ duration: 0.18 }}
+                    className="absolute right-0 top-full mt-3 w-64 bg-white shadow-2xl rounded-2xl z-50 overflow-hidden"
+                  >
+                    <div className="flex items-center gap-3 p-4 bg-brown-50">
+                      <Avatar user={currentUser} size={42} />
+                      <div className="min-w-0">
+                        <p className="font-semibold text-sm text-neutral-900 truncate">{currentUser.name}</p>
+                        <p className="text-xs text-neutral-500 truncate">{currentUser.email}</p>
+                        {roleLabel && <span className="mt-1 inline-block px-2 py-0.5 rounded-full bg-neutral-950 text-white text-[10px] font-bold uppercase tracking-wide">{roleLabel}</span>}
+                      </div>
+                    </div>
+                    <div className="p-1.5">
+                      {!isDeliveryBoy && (
+                        <Link href="/user/my-orders" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-brown-50 text-neutral-800 text-sm transition">
+                          <Box size={16} className="text-red-600" /> My Orders
+                        </Link>
+                      )}
+                      <Link href="/track" className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-brown-50 text-neutral-800 text-sm transition">
+                        <Truck size={16} className="text-red-600" /> Track Order
+                      </Link>
+                      <div className="h-px bg-brown-100 my-1.5 mx-2" />
+                      <button
+                        onClick={() => { setAccountOpen(false); signOut({ callbackUrl: '/' }) }}
+                        className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-red-600 hover:text-white text-red-600 text-sm font-medium transition cursor-pointer"
+                      >
+                        <LogOut size={16} /> Logout
+                      </button>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {!isDeliveryBoy && (
+              <button onClick={() => setCartOpen(true)} className={iconBtn} aria-label={`Cart, ${totalItems} items`}>
+                <ShoppingBag size={21} />
+                {mounted && totalItems > 0 && (
+                  <motion.span
+                    key={totalItems}
+                    initial={{ scale: 0 }} animate={{ scale: 1 }}
+                    className="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 flex items-center justify-center rounded-full bg-red-600 text-white text-[10px] font-bold ring-2 ring-neutral-950"
+                  >
+                    {totalItems > 99 ? '99+' : totalItems}
+                  </motion.span>
+                )}
+              </button>
+            )}
+
+            <button onClick={() => setDrawerOpen(true)} className={`${iconBtn} lg:hidden`} aria-label="Open menu">
+              <Menu size={22} />
+            </button>
+          </div>
+        </div>
+
+        {/* search panel */}
+        <AnimatePresence>
+          {searchOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.22 }}
+              className="overflow-hidden bg-brown-50 border-t border-white/10"
+            >
+              <div className="w-[95%] max-w-3xl mx-auto px-2 py-5 space-y-4">
+                <SearchBox autoFocus onNavigate={() => setSearchOpen(false)} />
+                <LocationPicker location={location} onSave={saveLocation} />
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </header>
+
+      {/* ── Mobile drawer ─────────────────────────────────────────────── */}
       <AnimatePresence>
-        {sidebarOpen && (
+        {drawerOpen && (
           <>
             <motion.div
               key="backdrop"
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              transition={{ duration: 0.2 }}
-              className="fixed inset-0 bg-black/40 z-60 md:hidden"
-              onClick={() => setSidebarOpen(false)}
+              className="fixed inset-0 bg-black/60 backdrop-blur-sm z-60 lg:hidden"
+              onClick={() => setDrawerOpen(false)}
             />
             <motion.aside
-              key="sidebar"
-              initial={{ x: '-100%' }} animate={{ x: 0 }} exit={{ x: '-100%' }}
-              transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-              className="fixed top-0 left-0 h-full w-72 bg-white z-70 md:hidden shadow-2xl flex flex-col"
+              key="drawer"
+              initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+              transition={{ type: 'spring', stiffness: 320, damping: 34 }}
+              className="fixed top-0 right-0 h-full w-[85%] max-w-sm bg-neutral-950 text-white z-70 lg:hidden flex flex-col"
             >
-              {/* Sidebar Header */}
-              <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-green-50">
-                <Link href="/" onClick={() => setSidebarOpen(false)} className="flex items-center gap-2 font-extrabold text-lg">
-                  <div className="bg-green-100 p-1.5 rounded-lg">
-                    <ShoppingCart className="text-green-600 w-4 h-4" />
-                  </div>
-                  Fresh<span className="text-green-600">Cart</span>
-                </Link>
-                <button onClick={() => setSidebarOpen(false)} className="p-1.5 rounded-lg hover:bg-gray-100 text-gray-500 transition">
-                  <X size={18} />
+              <div className="flex items-center justify-between px-5 h-16 border-b border-white/10">
+                <Logo />
+                <button onClick={() => setDrawerOpen(false)} className="w-10 h-10 rounded-full hover:bg-white/10 flex items-center justify-center" aria-label="Close menu">
+                  <X size={20} />
                 </button>
               </div>
 
-              {/* User Info */}
-              <div className="flex items-center gap-3 px-5 py-4 border-b border-gray-100">
-                <div className="w-11 h-11 rounded-full overflow-hidden bg-red-500 flex items-center justify-center shrink-0 shadow">
-                  {user?.image
-                    ? <Image src={user.image} alt={user.name} width={44} height={44} className="rounded-full object-cover" />
-                    : <User size={22} className="text-white" />}
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <span className="font-semibold text-sm text-gray-800 truncate">{user?.name ?? 'Guest'}</span>
-                  <span className="text-xs text-gray-500 truncate">{user?.email ?? ''}</span>
-                  {user?.role && (
-                    <span className={`mt-0.5 inline-flex items-center self-start px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${isAdmin ? 'bg-purple-100 text-purple-700' : user.role === 'deliveryBoy' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
-                      {user.role === 'deliveryBoy' ? 'Delivery Boy' : user.role}
-                    </span>
-                  )}
+              <div className="flex items-center gap-3 px-5 py-4 border-b border-white/10">
+                <Avatar user={currentUser} size={42} />
+                <div className="min-w-0">
+                  <p className="font-semibold text-sm truncate">{currentUser ? `Hi, ${currentUser.name}` : 'Welcome, Guest'}</p>
+                  {currentUser
+                    ? <p className="text-xs text-white/50 truncate capitalize">{roleLabel}</p>
+                    : <Link href="/login" className="text-xs text-red-400 font-semibold">Login / Register →</Link>}
                 </div>
               </div>
 
-              {/* Nav Links */}
-              <nav className="flex-1 overflow-y-auto px-3 py-3 space-y-1">
-                {isAdmin && (
-                  <>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-3 pt-2 pb-1">Admin</p>
-                    <Link href="/admin/add-grocery" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-green-50 text-gray-700 text-sm font-medium transition">
-                      <PlusCircle size={17} className="text-green-600 shrink-0" /> Add Grocery
+              <nav className="flex-1 overflow-y-auto px-3 py-3">
+                {NAV_LINKS.map((l) => (
+                  <Link
+                    key={l.label}
+                    href={l.href}
+                    onClick={() => setDrawerOpen(false)}
+                    className={`flex items-center justify-between px-3 py-3 rounded-xl text-[15px] font-medium transition ${isActive(l.href) ? 'text-white bg-white/10' : 'text-white/75 hover:bg-white/5'}`}
+                  >
+                    {l.label}
+                    {isActive(l.href) ? <span className="w-1.5 h-1.5 rounded-full bg-red-600" /> : <ArrowRight size={15} className="opacity-40" />}
+                  </Link>
+                ))}
+
+                <p className="px-3 pt-5 pb-2 text-[11px] font-bold uppercase tracking-[0.18em] text-white/40">Shop by category</p>
+                <div className="grid grid-cols-3 gap-2 px-1">
+                  {SPICE_CATEGORIES.map((c) => (
+                    <Link key={c.name} href={c.href} onClick={() => setDrawerOpen(false)} className="flex flex-col items-center gap-1 p-2 rounded-xl bg-brown-50 text-neutral-900">
+                      <span className="w-12 h-8">{c.image ? <img src={c.image} alt="" className="w-full h-full object-contain" /> : <SpiceArt kind={c.kind} colors={c.colors} id={`dr-${c.name}`} />}</span>
+                      <span className="text-[10px] font-semibold text-center leading-tight">{c.name}</span>
                     </Link>
-                    <Link href="/admin/view-grocery" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-green-50 text-gray-700 text-sm font-medium transition">
-                      <List size={17} className="text-green-600 shrink-0" /> View Grocery
-                    </Link>
-                    <Link href="/admin/manage-orders" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-green-50 text-gray-700 text-sm font-medium transition">
-                      <ClipboardList size={17} className="text-green-600 shrink-0" /> Manage Orders
-                    </Link>
-                    <div className="h-px bg-gray-100 my-2" />
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-3 pt-1 pb-1">General</p>
-                  </>
+                  ))}
+                </div>
+
+                {!isDeliveryBoy && (
+                  <div className="mt-5 mx-1 p-3 rounded-xl bg-brown-50">
+                    <LocationPicker location={location} onSave={saveLocation} />
+                  </div>
                 )}
-                <Link href="/user/my-orders" onClick={() => setSidebarOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-gray-50 text-gray-700 text-sm font-medium transition">
-                  <Box size={17} className="text-gray-500 shrink-0" /> My Orders
-                </Link>
+
+                <div className="mt-4 space-y-0.5">
+                  {currentUser && !isDeliveryBoy && (
+                    <Link href="/user/my-orders" onClick={() => setDrawerOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 text-white/80 text-sm">
+                      <Box size={17} className="text-red-500" /> My Orders
+                    </Link>
+                  )}
+                  <Link href="/track" onClick={() => setDrawerOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 text-white/80 text-sm">
+                    <Truck size={17} className="text-red-500" /> Track Order
+                  </Link>
+                  <Link href="/faqs" onClick={() => setDrawerOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-white/5 text-white/80 text-sm">
+                    <HelpCircle size={17} className="text-red-500" /> Help & FAQs
+                  </Link>
+                </div>
               </nav>
 
-              {/* Logout */}
-              <div className="px-3 pb-5 pt-2 border-t border-gray-100">
-                <button
-                  onClick={() => { setSidebarOpen(false); signOut({ callbackUrl: '/login' }) }}
-                  className="flex items-center gap-3 w-full px-3 py-2.5 rounded-xl hover:bg-red-50 text-red-500 text-sm font-medium transition"
-                >
-                  <LogOut size={17} className="shrink-0" /> Logout
-                </button>
+              <div className="p-4 border-t border-white/10">
+                {currentUser ? (
+                  <button
+                    onClick={() => signOut({ callbackUrl: '/' })}
+                    className="flex items-center justify-center gap-2 w-full py-3 rounded-full border border-white/20 hover:bg-red-600 hover:border-red-600 text-sm font-semibold transition cursor-pointer"
+                  >
+                    <LogOut size={16} /> Logout
+                  </button>
+                ) : (
+                  <Link href="/login" className="flex items-center justify-center gap-2 w-full py-3 rounded-full bg-red-600 hover:bg-red-700 text-sm font-semibold transition">
+                    <User size={16} /> Login / Register
+                  </Link>
+                )}
               </div>
             </motion.aside>
           </>
         )}
       </AnimatePresence>
-
-      {/* ── Main Navbar ─────────────────────────────────────────────────── */}
-      {!isAdmin && (
-        <nav className="w-[95%] fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-white shadow-lg rounded-2xl px-4 md:px-6 py-2.5 md:py-3">
-          <div className="flex items-center justify-between gap-3">
-
-            {/* LEFT: Hamburger + Logo + Location */}
-            <div className="flex items-center gap-3 md:gap-6 shrink-0">
-              <button
-                onClick={() => setSidebarOpen(true)}
-                className="flex md:hidden items-center justify-center w-9 h-9 rounded-xl hover:bg-gray-100 text-gray-600 transition"
-                aria-label="Open menu"
-              >
-                <Menu size={20} />
-              </button>
-
-              <Link href="/" className="flex items-center gap-1.5 font-extrabold text-lg md:text-xl whitespace-nowrap">
-                <div className="bg-green-100 p-1.5 md:p-2 rounded-lg">
-                  <ShoppingCart className="text-green-600 w-4 h-4 md:w-5 md:h-5" />
-                </div>
-                <span className="hidden sm:inline">Fresh<span className="text-green-600">Cart</span></span>
-              </Link>
-
-
-              {!isDeliveryBoy && (
-                <div ref={locationRef} className="relative">
-                  {/* Location Dropdown */}
-                            <div ref={locationRef} className="relative">
-                              <button
-                                onClick={() => setLocationOpen((p) => !p)}
-                                className="flex items-center gap-2 hover:bg-gray-50 px-2 md:px-3 py-1.5 md:py-2 rounded-xl transition cursor-pointer max-w-40 sm:max-w-55 md:max-w-none"
-                                aria-label="Change delivery location"
-                              >
-                                <div className="bg-green-100 p-1.5 md:p-2 rounded-full shrink-0">
-                                  <MapPin size={15} className="text-green-600" />
-                                </div>
-                                <div className="flex flex-col text-left min-w-0">
-                                  <span className="text-xs md:text-sm font-bold text-black leading-tight">Delivery in 30 min</span>
-                                  <span className="text-[10px] md:text-xs font-semibold text-gray-500 truncate max-w-30 md:max-w-45">{shortLocation}</span>
-                                </div>
-                              </button>
-
-                              <AnimatePresence>
-                                {locationOpen && (
-                                  <motion.div
-                                    initial={{ y: 8, opacity: 0, scale: 0.97 }}
-                                    animate={{ y: 0, opacity: 1, scale: 1 }}
-                                    exit={{ y: 8, opacity: 0, scale: 0.97 }}
-                                    transition={{ duration: 0.2 }}
-                                    className="absolute top-full mt-3 z-50 bg-white border border-gray-100 shadow-2xl rounded-2xl p-4 w-[calc(100vw-2rem)] max-w-sm left-0 sm:left-auto sm:w-95"
-                                  >
-                                    <div className="flex items-center justify-between mb-4">
-                                      <h3 className="font-bold text-base text-gray-800">Change Location</h3>
-                                      <button onClick={() => setLocationOpen(false)} className="text-gray-400 hover:text-gray-600 p-1 rounded-lg hover:bg-gray-100 transition">
-                                        <X size={16} />
-                                      </button>
-                                    </div>
-
-                                    <button
-                                      onClick={detectLocation} disabled={detecting}
-                                      className="flex items-center gap-3 w-full p-3 rounded-xl bg-green-50 hover:bg-green-100 transition mb-3 disabled:opacity-60"
-                                    >
-                                      {detecting ? <Loader2 size={18} className="text-green-600 animate-spin" /> : <LocateFixed size={18} className="text-green-600" />}
-                                      <div className="flex flex-col text-left">
-                                        <span className="font-semibold text-sm text-gray-800">{detecting ? 'Detecting…' : 'Use my current location'}</span>
-                                        <span className="text-xs text-gray-500">Accurate GPS-based detection</span>
-                                      </div>
-                                    </button>
-
-                                    <div className="flex items-center gap-2 my-3">
-                                      <div className="flex-1 h-px bg-gray-200" />
-                                      <span className="text-xs text-gray-400 font-medium">or search</span>
-                                      <div className="flex-1 h-px bg-gray-200" />
-                                    </div>
-
-                                    <div className="relative mb-2">
-                                      <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
-                                      <input
-                                        value={query}
-                                        onChange={(e) => searchLocation(e.target.value)}
-                                        placeholder="Search area, street, city…"
-                                        className="w-full border border-gray-200 rounded-xl py-2.5 pl-9 pr-3 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 bg-gray-50"
-                                      />
-                                      {query && (
-                                        <button onClick={() => { setQuery(''); setResults([]) }} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600">
-                                          <X size={14} />
-                                        </button>
-                                      )}
-                                    </div>
-
-                                    {results.length > 0 && (
-                                      <div className="max-h-52 overflow-y-auto rounded-xl border border-gray-100 divide-y divide-gray-50">
-                                        {results.map((item: any) => (
-                                          <button key={item.place_id} onClick={() => saveLocation(item.display_name)} className="flex items-start gap-3 w-full text-left px-3 py-2.5 hover:bg-green-50 transition">
-                                            <MapPin size={14} className="mt-0.5 shrink-0 text-green-500" />
-                                            <span className="text-sm text-gray-700 leading-snug">{item.display_name}</span>
-                                          </button>
-                                        ))}
-                                      </div>
-                                    )}
-
-                                    {query.length >= 3 && results.length === 0 && (
-                                      <p className="text-sm text-center text-gray-400 py-3">No results found. Try a different query.</p>
-                                    )}
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
-                            </div>
-                </div>
-              )}
-              
-            </div>
-
-          {!isDeliveryBoy && (
-            <div className="flex-1 max-w-xl mx-4 hidden md:block">
-              {/* CENTER: Search bar — desktop */}
-                      <div className="flex-1 max-w-xl mx-4 hidden md:block">
-                        <div className="relative">
-                          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={17} />
-                          <input
-                            type="text"
-                            placeholder="Search for fruits, vegetables, dairy…"
-                            className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-10 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 transition"
-                          />
-                        </div>
-                      </div>
-            </div>
-          )}
-
-           
-            {/* RIGHT: Role badge + User dropdown + Cart */}
-            <div className="flex items-center gap-3 md:gap-4 shrink-0">
-
-              {/* Role badge — desktop */}
-              {user?.role && (
-                <span className={`hidden md:inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide ${isAdmin ? 'bg-purple-100 text-purple-700' : user.role === 'deliveryBoy' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
-                  {user.role === 'deliveryBoy' ? 'Delivery Boy' : user.role}
-                </span>
-              )}
-
-              {/* User Dropdown */}
-              <div ref={dropdownRef} className="relative">
-                <button
-                  onClick={() => setOpen((p) => !p)}
-                  className="flex items-center cursor-pointer hover:bg-black justify-center w-9 h-9 md:w-10 md:h-10 bg-red-500 rounded-full text-white transition shadow-sm overflow-hidden"
-                  aria-label="User menu"
-                >
-                  {user?.image
-                    ? <Image src={user.image} alt={user.name} width={40} height={40} className="rounded-full object-cover w-full h-full" />
-                    : <User size={20} />}
-                </button>
-
-                <AnimatePresence>
-                  {open && (
-                    <motion.div
-                      initial={{ y: 8, opacity: 0, scale: 0.97 }}
-                      animate={{ y: 0, opacity: 1, scale: 1 }}
-                      exit={{ y: 8, opacity: 0, scale: 0.97 }}
-                      transition={{ duration: 0.2 }}
-                      className="absolute right-0 top-full mt-3 w-56 bg-white shadow-2xl rounded-2xl border border-gray-100 z-50 overflow-hidden"
-                    >
-                      <div className="flex items-center gap-3 p-4 border-b border-gray-100 bg-gray-50">
-                        <div className="w-10 h-10 rounded-full overflow-hidden bg-red-500 flex items-center justify-center shrink-0">
-                          {user?.image
-                            ? <Image src={user.image} alt={user.name} width={40} height={40} className="rounded-full object-cover" />
-                            : <User size={22} className="text-white" />}
-                        </div>
-                        <div className="flex flex-col min-w-0">
-                          <span className="font-semibold text-sm text-gray-800 truncate">{user?.name ?? 'Guest'}</span>
-                          <span className="text-xs text-gray-500 truncate">{user?.email ?? ''}</span>
-                          {user?.role && (
-                            <span className={`mt-1 inline-flex items-center self-start px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${isAdmin ? 'bg-purple-100 text-purple-700' : user.role === 'deliveryBoy' ? 'bg-blue-100 text-blue-700' : 'bg-green-100 text-green-700'}`}>
-                              {user.role === 'deliveryBoy' ? 'Delivery Boy' : user.role}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-
-                      {isAdmin && (
-                        <>
-                          <div className="px-3 pt-2 pb-1">
-                            <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 px-1">Admin</p>
-                          </div>
-                          <Link href="/admin/manage-orders" onClick={() => setOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-green-50 text-gray-700 text-sm transition">
-                            <ClipboardList size={16} className="text-green-600" /> Setting
-                          </Link>
-                          <div className="h-px bg-gray-100 mx-3 my-1" />
-                        </>
-                      )}
-
-                      <div className="py-1">
-                          {!isDeliveryBoy && (
-                        <div ref={locationRef} className="relative">
-                          <Link href="/user/my-orders" onClick={() => setOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-gray-700 text-sm transition">
-                          <Box size={16} /> My Orders
-                        </Link>
-                        </div>
-                      )}
-                        {/* <Link href="/user/my-orders" onClick={() => setOpen(false)} className="flex items-center gap-3 px-4 py-2.5 hover:bg-gray-50 text-gray-700 text-sm transition">
-                          <Box size={16} /> My Orders
-                        </Link> */}
-                        <button
-                          className="flex cursor-pointer items-center gap-3 px-4 py-2.5 hover:bg-red-50 text-red-500 text-sm w-full transition"
-                          onClick={() => { setOpen(false); signOut({ callbackUrl: '/login' }) }}
-                        >
-                          <LogOut size={16} /> Logout
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-
-              {!isDeliveryBoy && (
-              <button
-                onClick={() => setCartOpen(true)}
-                className="relative flex cursor-pointer hover:bg-green-600 items-center justify-center w-9 h-9 md:w-10 md:h-10 bg-green-600 text-white rounded-full transition shadow-md"
-              >
-               <ShoppingCart size={19} />
-                <AnimatePresence>
-                {mounted && totalItems > 0 && (
-                  <motion.span
-                    key={totalItems}
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    exit={{ scale: 0 }}
-                    className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] font-bold w-5 h-5 flex items-center justify-center rounded-full shadow"
-                  >
-                    {totalItems > 99 ? '99+' : totalItems}
-                  </motion.span>
-                )}
-              </AnimatePresence>
-              </button>
-            )}
-
-            </div>
-          </div>
-
-          {!isDeliveryBoy && (
-        <div className="mt-2.5 md:hidden">
-          {/* Mobile Search Bar */}
-                <div className="mt-2.5 md:hidden">
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={16} />
-                    <input
-                      type="text"
-                      placeholder="Search fruits, vegetables, dairy…"
-                      className="w-full bg-gray-50 border border-gray-200 rounded-xl py-2.5 pl-9 pr-4 text-sm focus:outline-none focus:ring-2 focus:ring-green-400 transition"
-                    />
-                    </div>
-                  </div>
-          </div>
-        )}
-
-        </nav>
-      )}
-
-      <div className="h-12 md:h-4" />
     </>
   )
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
 import { Provider } from "@/Provider";
-import { Geist } from "next/font/google";
+import { Geist, Bricolage_Grotesque, Caveat_Brush, DM_Serif_Display } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import StoreProvider from "@/redux/StoreProvider";
@@ -11,6 +11,9 @@ import InitUser from "@/InitUser";
 
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
+const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["600", "700", "800"], variable: "--font-display-src" });
+const hand = Caveat_Brush({ subsets: ["latin"], weight: "400", variable: "--font-hand-src" });
+const serif = DM_Serif_Display({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-serif-src" });
 
 export const metadata: Metadata = {
   title: "FreshCart | 30 Minutes Grocery Delivery",
@@ -23,8 +26,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("font-sans", geist.variable)}>
-      <body className="w-full min-h-screen bg-green-50 antialiased">
+    <html lang="en" className={cn("font-sans", geist.variable, display.variable, hand.variable, serif.variable)}>
+      <body className="w-full min-h-screen bg-brown-50 text-brown-900 antialiased">
         <LoaderProvider>
           <Provider>
             <TooltipProvider>

@@ -10,8 +10,7 @@ import {
   removeFromCart,
   increaseQty,
   decreaseQty,
-  ICartItem,
-} from '@/redux/cartSlice'
+  ICartItem, lineKey } from '@/redux/cartSlice'
 import { useRouter } from 'next/navigation'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -135,7 +134,7 @@ export default function CartPage() {
             <AnimatePresence>
               {cartData.map((item: ICartItem, idx: number) => (
                 <motion.div
-                  key={item._id}
+                  key={lineKey(item)}
                   layout
                   initial={{ opacity: 0, y: 16 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -153,6 +152,7 @@ export default function CartPage() {
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <h3 className="font-semibold text-gray-800 text-sm sm:text-base truncate">{item.name}</h3>
+                    {item.variant && <p className="text-xs text-gray-500 mt-0.5">{item.variant}</p>}
 
                     <div className="flex items-center justify-between mt-2 gap-2 flex-wrap">
                       {/* Price */}
@@ -168,7 +168,7 @@ export default function CartPage() {
                       {/* Controls */}
                       <div className="flex items-center gap-2">
                         <button
-                          onClick={() => dispatch(decreaseQty(item._id))}
+                          onClick={() => dispatch(decreaseQty(lineKey(item)))}
                           className="w-8 h-8 rounded-full bg-green-50 hover:bg-green-100 text-green-700 flex items-center justify-center transition-colors active:scale-90"
                           aria-label="Decrease quantity"
                         >
@@ -180,7 +180,7 @@ export default function CartPage() {
                         </span>
 
                         <button
-                          onClick={() => dispatch(increaseQty(item._id))}
+                          onClick={() => dispatch(increaseQty(lineKey(item)))}
                           className="w-8 h-8 rounded-full bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition-colors active:scale-90 shadow-sm"
                           aria-label="Increase quantity"
                         >
@@ -188,7 +188,7 @@ export default function CartPage() {
                         </button>
 
                         <button
-                          onClick={() => dispatch(removeFromCart(item._id))}
+                          onClick={() => dispatch(removeFromCart(lineKey(item)))}
                           className="w-8 h-8 rounded-full bg-red-50 hover:bg-red-100 text-red-400 hover:text-red-600 flex items-center justify-center transition-colors ml-1 active:scale-90"
                           aria-label="Remove item"
                         >

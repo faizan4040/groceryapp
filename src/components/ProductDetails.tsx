@@ -261,7 +261,7 @@ export default function ProductDetailClient({ product }: { product: IGrocery }) 
             {product.highlights.map((h, i) => (
               <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
                 <CheckCircle size={15} className="text-green-500 mt-0.5 shrink-0" />
-                {h}
+                {typeof h === "string" ? h : h.title}
               </li>
             ))}
           </ul>

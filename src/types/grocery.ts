@@ -15,7 +15,12 @@ export interface IGrocery {
   rating?: number
   reviewCount?: number
   tags?: string[]
-  highlights?: string[]
+  highlights?: (string | { title: string; text?: string })[]
+  variants?: { label: string; price: number; originalPrice?: number; discount?: number; stock?: number; quantity?: number; unit?: string; image?: string; _id?: string }[]
+  ingredients?: string
+  nutrition?: { label: string; value: string }[]
+  nutritionServing?: string
+  featured?: boolean
 }
 
 

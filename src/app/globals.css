@@ -147,3 +147,31 @@
   animation: fadeInUp 0.5s ease forwards;
   opacity: 0;
 }
+/* ── Brand palette: browns (very light → dark) ── */
+@theme {
+  --color-brown-50:  #faf5ef; /* very light brown – soft backgrounds */
+  --color-brown-100: #f1e6d8;
+  --color-brown-200: #e2cdb4;
+  --color-brown-300: #cfae8a;
+  --color-brown-400: #b88a62; /* light brown */
+  --color-brown-500: #9c6b43;
+  --color-brown-600: #6f4425; /* dark brown – primary */
+  --color-brown-700: #5a3720;
+  --color-brown-900: #2e1c10;
+}
+
+@theme inline {
+  --font-display: var(--font-display-src), ui-sans-serif, system-ui, sans-serif;
+  --font-hand: var(--font-hand-src), cursive;
+  --font-serif: var(--font-serif-src), Georgia, serif;
+}
+
+/* ── Spice ticker ── */
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee { animation: marquee 40s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee { animation: none; }
+}

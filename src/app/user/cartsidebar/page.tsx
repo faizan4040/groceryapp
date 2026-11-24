@@ -1,244 +1,281 @@
 'use client'
 
-import React from 'react'
-import { X, ShoppingBasket, Plus, Minus, Trash2, ShoppingCart, ArrowRight } from 'lucide-react'
+import React, { useEffect } from 'react'
+import { X, Plus, Minus, Trash2, ShoppingBag, ArrowRight, Truck, Lock } from 'lucide-react'
 import { motion, AnimatePresence } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useSelector, useDispatch } from 'react-redux'
-import { RootState } from '@/redux/store'
-import { increaseQty, decreaseQty, removeFromCart, ICartItem } from '@/redux/cartSlice'
 import { useRouter } from 'next/navigation'
+import { RootState } from '@/redux/store'
+import { increaseQty, decreaseQty, removeFromCart, clearCart, ICartItem, lineKey } from '@/redux/cartSlice'
+import { SPICE_CATEGORIES } from '@/components/SpiceArt'
 
-// ─── Helpers ─────────────────────────────────────────────────────────────────
 const fmt = (n: number) =>
-  new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR',
-    maximumFractionDigits: 2,
-  }).format(n)
+  `₹${n.toLocaleString('en-IN', { minimumFractionDigits: Number.isInteger(n) ? 0 : 2, maximumFractionDigits: 2 })}`
 
+// keep in sync with /user/cart and /user/checkout
 const DELIVERY_THRESHOLD = 499
 const DELIVERY_FEE = 49
 
+const WEIGHT_UNITS = ['g', 'kg', 'ml', 'liter']
 
 interface CartSidebarProps {
   open: boolean
   onClose: () => void
 }
 
-
 export default function CartSidebar({ open, onClose }: CartSidebarProps) {
   const dispatch = useDispatch()
+  const router = useRouter()
   const cartData: ICartItem[] = useSelector((state: RootState) => state.cart.cartData)
 
   const subtotal = cartData.reduce((s, i) => s + i.price * i.quantity, 0)
-  const delivery = subtotal >= DELIVERY_THRESHOLD ? 0 : subtotal === 0 ? 0 : DELIVERY_FEE
+  const delivery = subtotal === 0 || subtotal >= DELIVERY_THRESHOLD ? 0 : DELIVERY_FEE
   const total = subtotal + delivery
   const totalQty = cartData.reduce((s, i) => s + i.quantity, 0)
   const progress = Math.min(100, (subtotal / DELIVERY_THRESHOLD) * 100)
-  const remaining = DELIVERY_THRESHOLD - subtotal
+  const remaining = Math.max(0, DELIVERY_THRESHOLD - subtotal)
+  const empty = cartData.length === 0
 
-  const route = useRouter()
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
+    document.addEventListener('keydown', onKey)
+    return () => document.removeEventListener('keydown', onKey)
+  }, [open, onClose])
+
+  const goCheckout = () => { onClose(); router.push('/user/checkout') }
+  const clearAll = () => { if (window.confirm('Remove all items from your cart?')) dispatch(clearCart()) }
 
   return (
     <AnimatePresence>
       {open && (
         <>
-          {/* Backdrop */}
           <motion.div
             key="cart-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-0 bg-black/40 z-80 backdrop-blur-[2px]"
+            className="fixed inset-0 bg-black/55 backdrop-blur-[3px] z-80"
             onClick={onClose}
           />
 
-          {/* Drawer */}
           <motion.aside
             key="cart-drawer"
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', stiffness: 320, damping: 32 }}
-            className="fixed top-0 right-0 h-full w-full sm:w-100 bg-white z-90 flex flex-col shadow-2xl"
+            initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }}
+            transition={{ type: 'spring', stiffness: 320, damping: 34 }}
+            className="fixed top-0 right-0 h-full w-full sm:w-[440px] bg-[#FBF6EE] z-90 flex flex-col shadow-2xl"
+            role="dialog" aria-modal="true" aria-label="Shopping cart"
           >
-            {/* ── Header ─────────────────────────────────────────── */}
-            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 bg-white shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="bg-green-100 p-2 rounded-xl">
-                  <ShoppingCart size={18} className="text-green-600" />
+            {/* ── header ───────────────────────────────────── */}
+            <div className="relative shrink-0 bg-neutral-950 text-white px-5 pt-5 pb-5 overflow-hidden">
+              <div className="absolute -right-12 -top-16 w-48 h-48 rounded-full bg-red-600/25 blur-3xl" />
+              <div className="relative flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <span className="relative w-11 h-11 rounded-full bg-red-600 flex items-center justify-center">
+                    <ShoppingBag size={20} />
+                    {totalQty > 0 && (
+                      <span className="absolute -top-1 -right-1 min-w-5 h-5 px-1 rounded-full bg-white text-neutral-950 text-[11px] font-bold flex items-center justify-center">
+                        {totalQty > 99 ? '99+' : totalQty}
+                      </span>
+                    )}
+                  </span>
+                  <div>
+                    <h2 className="font-serif text-2xl leading-none">Your Cart</h2>
+                    <p className="text-xs text-white/55 mt-1">
+                      {empty ? 'Nothing here yet' : `${totalQty} ${totalQty === 1 ? 'item' : 'items'} · ${fmt(subtotal)}`}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="font-bold text-gray-800 text-base leading-tight">My Cart</h2>
-                  <p className="text-xs text-gray-400">{totalQty} {totalQty === 1 ? 'item' : 'items'}</p>
-                </div>
-              </div>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 flex items-center justify-center rounded-xl hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition"
-                aria-label="Close cart"
-              >
-                <X size={18} />
-              </button>
-            </div>
-
-            {/* ── Delivery Progress ───────────────────────────────── */}
-            {subtotal > 0 && (
-              <div className="px-5 py-3 bg-green-50 border-b border-green-100 shrink-0">
-                {delivery === 0 ? (
-                  <p className="text-xs font-semibold text-green-700 mb-1.5">
-                    🎉 You've unlocked <strong>free delivery!</strong>
-                  </p>
-                ) : (
-                  <p className="text-xs font-semibold text-green-700 mb-1.5">
-                    Add <strong>{fmt(remaining)}</strong> more for free delivery
-                  </p>
-                )}
-                <div className="w-full bg-green-200 rounded-full h-1.5 overflow-hidden">
-                  <motion.div
-                    className="h-full bg-green-500 rounded-full"
-                    initial={{ width: 0 }}
-                    animate={{ width: `${progress}%` }}
-                    transition={{ duration: 0.5, ease: 'easeOut' }}
-                  />
-                </div>
-              </div>
-            )}
-
-            {/* ── Items List ──────────────────────────────────────── */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2.5">
-              {cartData.length === 0 ? (
-                /* Empty state */
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="flex flex-col items-center justify-center h-full gap-4 pb-10"
+                <button
+                  onClick={onClose}
+                  aria-label="Close cart"
+                  className="w-10 h-10 rounded-full border border-white/15 flex items-center justify-center text-white/80 hover:bg-white hover:text-neutral-950 transition cursor-pointer"
                 >
-                  <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center">
-                    <ShoppingBasket size={34} className="text-gray-300" />
-                  </div>
-                  <div className="text-center">
-                    <p className="font-semibold text-gray-600 text-sm">Your cart is empty</p>
-                    <p className="text-xs text-gray-400 mt-1">Add some fresh items to get started</p>
-                  </div>
-                  <button
-                    onClick={onClose}
-                    className="mt-2 bg-green-600 text-white text-sm font-semibold px-6 py-2.5 rounded-full hover:bg-green-700 transition active:scale-95"
-                  >
-                    Browse Products
-                  </button>
-                </motion.div>
-              ) : (
-                <AnimatePresence initial={false}>
-                  {cartData.map((item: ICartItem) => (
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* free-delivery progress */}
+              {!empty && (
+                <div className="relative mt-5">
+                  <p className="flex items-center gap-2 text-xs text-white/80">
+                    <Truck size={15} className={delivery === 0 ? 'text-green-400' : 'text-red-400'} />
+                    {delivery === 0
+                      ? <span><strong className="text-white">Free delivery</strong> unlocked on this order</span>
+                      : <span>Add <strong className="text-white">{fmt(remaining)}</strong> more for <strong className="text-white">free delivery</strong></span>}
+                  </p>
+                  <div className="mt-2.5 h-1.5 rounded-full bg-white/10 overflow-hidden">
                     <motion.div
-                      key={item._id}
-                      layout
-                      initial={{ opacity: 0, x: 30 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: 40, transition: { duration: 0.2 } }}
-                      transition={{ duration: 0.25 }}
-                      className="flex items-center gap-3 bg-gray-50 rounded-2xl p-3 hover:bg-gray-100/70 transition-colors group"
-                    >
-                      {/* Image */}
-                      <div className="w-14 h-14 rounded-xl bg-white border border-gray-100 shrink-0 overflow-hidden flex items-center justify-center shadow-sm">
-                        {item.image ? (
-                          <Image
-                            src={item.image}
-                            alt={item.name}
-                            width={56}
-                            height={56}
-                            className="object-cover w-full h-full"
-                          />
-                        ) : (
-                          <ShoppingBasket size={22} className="text-gray-300" />
-                        )}
-                      </div>
-
-                      {/* Name + Price */}
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-semibold text-gray-800 truncate leading-tight">{item.name}</p>
-                        <p className="text-xs text-gray-400 mt-0.5">{fmt(item.price)} each</p>
-                        <p className="text-sm font-bold text-green-700 mt-0.5">
-                          {fmt(item.price * item.quantity)}
-                        </p>
-                      </div>
-
-                      {/* Controls */}
-                      <div className="flex flex-col items-end gap-1.5 shrink-0">
-                        <button
-                          onClick={() => dispatch(removeFromCart(item._id))}
-                          className="opacity-0 group-hover:opacity-100 transition w-6 h-6 flex items-center justify-center rounded-lg hover:bg-red-100 text-red-400 hover:text-red-600"
-                          aria-label="Remove"
-                        >
-                          <Trash2 size={13} />
-                        </button>
-                        <div className="flex items-center gap-1.5 bg-white border border-gray-200 rounded-xl px-1.5 py-1 shadow-sm">
-                          <button
-                            onClick={() => dispatch(decreaseQty(item._id))}
-                            className="w-6 h-6 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-600 flex items-center justify-center transition active:scale-90"
-                            aria-label="Decrease"
-                          >
-                            <Minus size={12} />
-                          </button>
-                          <span className="w-5 text-center text-sm font-bold text-gray-800">
-                            {item.quantity}
-                          </span>
-                          <button
-                            onClick={() => dispatch(increaseQty(item._id))}
-                            className="w-6 h-6 rounded-lg bg-green-600 hover:bg-green-700 text-white flex items-center justify-center transition active:scale-90"
-                            aria-label="Increase"
-                          >
-                            <Plus size={12} />
-                          </button>
-                        </div>
-                      </div>
-                    </motion.div>
-                  ))}
-                </AnimatePresence>
+                      className={`h-full rounded-full ${delivery === 0 ? 'bg-green-500' : 'bg-red-600'}`}
+                      initial={{ width: 0 }}
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: 0.6, ease: 'easeOut' }}
+                    />
+                  </div>
+                </div>
               )}
             </div>
 
-            {/* ── Footer: Summary + CTA ───────────────────────────── */}
-            {cartData.length > 0 && (
-              <div className="shrink-0 border-t border-gray-100 bg-white px-5 py-4 space-y-3">
-                {/* Price rows */}
-                <div className="space-y-1.5 text-sm">
-                  <div className="flex justify-between text-gray-500">
-                    <span>Subtotal</span>
-                    <span className="font-medium text-gray-700">{fmt(subtotal)}</span>
+            {/* ── body ─────────────────────────────────────── */}
+            <div className="flex-1 overflow-y-auto">
+              {empty ? (
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+                  className="flex flex-col items-center text-center px-6 pt-10 pb-8"
+                >
+                  <div className="relative w-44 h-32">
+                    <span className="absolute inset-x-4 bottom-0 h-24 rounded-[50%] bg-red-600/10" />
+                    <Image src="/spices/ground-spices.png" alt="" fill sizes="176px" className="object-contain drop-shadow-[0_10px_12px_rgba(0,0,0,0.2)]" />
                   </div>
-                  <div className="flex justify-between text-gray-500">
-                    <span>Delivery</span>
-                    {delivery === 0
-                      ? <span className="text-green-600 font-semibold">FREE</span>
-                      : <span className="font-medium text-gray-700">{fmt(delivery)}</span>}
-                  </div>
-                  <div className="flex justify-between font-bold text-gray-800 text-base pt-1 border-t border-dashed border-gray-200">
-                    <span>Total</span>
-                    <span className="text-green-700">{fmt(total)}</span>
-                  </div>
-                </div>
-
-                {/* CTA buttons */}
-                <div className="flex gap-2">
+                  <h3 className="font-serif text-[28px] text-neutral-950 mt-5">Your cart is empty</h3>
+                  <p className="text-sm text-neutral-500 mt-2 max-w-64">Add some pure, freshly packed masala and bring real taste to your kitchen.</p>
                   <Link
-                    href="/user/cart"
+                    href="/#shop"
                     onClick={onClose}
-                    className="flex-1 text-center py-3 rounded-xl border border-green-600 text-green-700 text-sm font-semibold hover:bg-green-50 transition active:scale-95"
+                    className="mt-6 inline-flex items-center gap-2 h-12 px-7 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold border-2 border-neutral-950 shadow-[3px_3px_0_#0a0a0a] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0_#0a0a0a] transition"
                   >
-                    View Cart
+                    Start shopping <ArrowRight size={17} />
                   </Link>
-                  <motion.button
-                    whileTap={{ scale: 0.97 }}
-                    className="flex-1 flex items-center cursor-pointer justify-center gap-1.5 py-3 rounded-xl bg-green-600 hover:bg-green-700 text-white text-sm font-bold transition shadow-md shadow-green-200"
-                    onClick={()=>route.push('/user/checkout')}
-                  >
-                    Checkout <ArrowRight size={15} />
-                  </motion.button>
+
+                  <div className="w-full mt-10">
+                    <p className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-neutral-500">
+                      <span className="flex-1 h-px bg-neutral-900/10" /> Shop by category <span className="flex-1 h-px bg-neutral-900/10" />
+                    </p>
+                    <div className="grid grid-cols-3 gap-2.5 mt-4">
+                      {SPICE_CATEGORIES.map((c) => (
+                        <Link
+                          key={c.name}
+                          href={c.href}
+                          onClick={onClose}
+                          className="group flex flex-col items-center gap-1.5 p-3 rounded-2xl bg-white border border-neutral-900/5 hover:border-red-600/30 hover:shadow-md transition"
+                        >
+                          <span className="relative w-14 h-10">
+                            {c.image && <Image src={c.image} alt="" fill sizes="56px" className="object-contain group-hover:scale-110 transition-transform" />}
+                          </span>
+                          <span className="text-[11px] font-semibold text-neutral-800 leading-tight">{c.name}</span>
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                </motion.div>
+              ) : (
+                <div className="px-4 py-4">
+                  <div className="flex items-center justify-between px-1 mb-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-neutral-500">In your cart</p>
+                    <button onClick={clearAll} className="text-xs font-medium text-neutral-500 hover:text-red-600 transition cursor-pointer">
+                      Clear all
+                    </button>
+                  </div>
+
+                  <ul className="space-y-2.5">
+                    <AnimatePresence initial={false}>
+                      {cartData.map((item) => {
+                        const key = lineKey(item)
+                        const pack = item.variant || (item.unit && !WEIGHT_UNITS.includes(item.unit) ? `1 ${item.unit}` : '')
+                        return (
+                          <motion.li
+                            key={key}
+                            layout
+                            initial={{ opacity: 0, x: 30 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 60, transition: { duration: 0.2 } }}
+                            className="flex gap-3.5 p-3 rounded-2xl bg-white border border-neutral-900/[0.06] shadow-[0_1px_2px_rgba(0,0,0,0.04)]"
+                          >
+                            <Link
+                              href={`/products/${item._id}`}
+                              onClick={onClose}
+                              className="relative w-20 h-20 shrink-0 rounded-xl bg-[#F6EEE3] overflow-hidden isolate"
+                            >
+                              {item.image && (
+                                <Image src={item.image} alt={item.name} fill sizes="80px" className="object-contain p-1.5 mix-blend-multiply" />
+                              )}
+                            </Link>
+
+                            <div className="flex-1 min-w-0 flex flex-col">
+                              <div className="flex items-start gap-2">
+                                <Link
+                                  href={`/products/${item._id}`}
+                                  onClick={onClose}
+                                  className="flex-1 text-sm font-semibold text-neutral-900 leading-snug line-clamp-2 hover:text-red-700 transition"
+                                >
+                                  {item.name}
+                                </Link>
+                                <button
+                                  onClick={() => dispatch(removeFromCart(key))}
+                                  aria-label={`Remove ${item.name}`}
+                                  className="w-7 h-7 -mt-1 -mr-1 shrink-0 rounded-full flex items-center justify-center text-neutral-400 hover:bg-red-50 hover:text-red-600 transition cursor-pointer"
+                                >
+                                  <Trash2 size={14} />
+                                </button>
+                              </div>
+                              <p className="font-mono text-[11px] text-neutral-500 mt-0.5 uppercase tracking-wide">
+                                {pack ? `${pack} · ` : ''}{fmt(item.price)} each
+                              </p>
+
+                              <div className="flex items-center justify-between mt-auto pt-2">
+                                <div className="flex items-center h-8 rounded-full border border-neutral-900/15 bg-[#FBF6EE]">
+                                  <button
+                                    onClick={() => dispatch(decreaseQty(key))}
+                                    aria-label="Decrease quantity"
+                                    className="w-8 h-8 rounded-full flex items-center justify-center text-neutral-700 hover:text-red-600 cursor-pointer"
+                                  >
+                                    {item.quantity === 1 ? <Trash2 size={13} /> : <Minus size={14} />}
+                                  </button>
+                                  <span className="w-6 text-center text-sm font-bold text-neutral-900 tabular-nums">{item.quantity}</span>
+                                  <button
+                                    onClick={() => dispatch(increaseQty(key))}
+                                    aria-label="Increase quantity"
+                                    className="w-8 h-8 rounded-full flex items-center justify-center text-neutral-700 hover:text-red-600 cursor-pointer"
+                                  >
+                                    <Plus size={14} />
+                                  </button>
+                                </div>
+                                <span className="text-base font-bold text-neutral-950 tabular-nums">{fmt(item.price * item.quantity)}</span>
+                              </div>
+                            </div>
+                          </motion.li>
+                        )
+                      })}
+                    </AnimatePresence>
+                  </ul>
+                </div>
+              )}
+            </div>
+
+            {/* ── summary + checkout ──────────────────────── */}
+            {!empty && (
+              <div className="shrink-0 bg-white border-t border-neutral-900/10 px-5 pt-4 pb-5 shadow-[0_-10px_30px_-15px_rgba(0,0,0,0.15)]">
+                <dl className="space-y-1.5 text-sm">
+                  <div className="flex justify-between text-neutral-600">
+                    <dt>Subtotal</dt>
+                    <dd className="font-medium text-neutral-900 tabular-nums">{fmt(subtotal)}</dd>
+                  </div>
+                  <div className="flex justify-between text-neutral-600">
+                    <dt>Delivery</dt>
+                    <dd className={delivery === 0 ? 'font-semibold text-green-700' : 'font-medium text-neutral-900 tabular-nums'}>
+                      {delivery === 0 ? 'FREE' : fmt(delivery)}
+                    </dd>
+                  </div>
+                  <div className="flex justify-between items-baseline pt-2.5 mt-1 border-t border-dashed border-neutral-900/15">
+                    <dt className="font-semibold text-neutral-900">Total</dt>
+                    <dd className="font-serif text-[28px] leading-none text-neutral-950 tabular-nums">{fmt(total)}</dd>
+                  </div>
+                </dl>
+
+                <button
+                  onClick={goCheckout}
+                  className="mt-4 w-full h-13 py-3.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold flex items-center justify-center gap-2 border-2 border-neutral-950 shadow-[3px_3px_0_#0a0a0a] active:translate-x-[2px] active:translate-y-[2px] active:shadow-[1px_1px_0_#0a0a0a] transition cursor-pointer"
+                >
+                  <Lock size={16} /> Checkout · {fmt(total)}
+                </button>
+                <div className="flex items-center justify-between mt-3 text-xs">
+                  <Link href="/user/cart" onClick={onClose} className="font-semibold text-neutral-800 underline underline-offset-4 decoration-neutral-300 hover:decoration-neutral-900">
+                    View full cart
+                  </Link>
+                  <button onClick={onClose} className="font-medium text-neutral-500 hover:text-neutral-900 cursor-pointer">
+                    Continue shopping
+                  </button>
                 </div>
               </div>
             )}

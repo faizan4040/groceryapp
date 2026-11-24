@@ -18,8 +18,14 @@ const Home = async () => {
 
   const session = await auth()
 
+  // Guest (not logged in) → show public homepage
   if (!session?.user?.email) {
-    redirect("/login")
+    return (
+      <div>
+        <Navbar overlay />
+        <UserDashboard />
+      </div>
+    )
   }
 
   const user = await User.findOne({ email: session.user.email })
@@ -38,7 +44,7 @@ const Home = async () => {
 
   return (
     <div>
-      <Navbar user={plainUser} />
+      <Navbar user={plainUser} overlay={user.role === "user"} />
        <GeoUpdater userId={plainUser._id}/>
       {user.role === "user" ? (
         <UserDashboard />

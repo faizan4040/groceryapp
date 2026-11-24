@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Search, Trash2, Loader2, CheckCircle2, AlertCircle, ShoppingBasket, SlidersHorizontal, Pencil, X, Check, ChevronLeft, ChevronRight } from "lucide-react"
+import { Star, Search, Trash2, Loader2, CheckCircle2, AlertCircle, ShoppingBasket, SlidersHorizontal, Pencil, X, Check, ChevronLeft, ChevronRight } from "lucide-react"
 import axios from "axios"
 import { motion, AnimatePresence } from "motion/react"
 
@@ -14,6 +14,7 @@ interface Grocery {
   stock: number
   discount: number
   image: string
+  featured?: boolean
   createdAt: string
 }
 
@@ -87,6 +88,24 @@ export default function ViewGrocery() {
   const showToast = (type: "success" | "error", msg: string) => {
     setToast({ type, msg })
     setTimeout(() => setToast(null), 2500)
+  }
+
+  const [featuringId, setFeaturingId] = useState<string | null>(null)
+
+  // show / hide a product in the home-page "Featured" carousel
+  const toggleFeatured = async (item: Grocery) => {
+    const next = !item.featured
+    setFeaturingId(item._id)
+    try {
+      await axios.patch(`/api/admin/grocery/grocery/${item._id}`, { featured: next })
+      setGroceries(prev => prev.map(g => g._id === item._id ? { ...g, featured: next } : g))
+      setToast({ type: "success", msg: next ? `"${item.name}" added to Featured` : `"${item.name}" removed from Featured` })
+    } catch {
+      setToast({ type: "error", msg: "Could not update Featured" })
+    } finally {
+      setFeaturingId(null)
+      setTimeout(() => setToast(null), 2500)
+    }
   }
 
   const handleDelete = async (id: string) => {
@@ -231,9 +250,9 @@ export default function ViewGrocery() {
 
         {/* Table Head */}
         <div className="grid px-5 py-3 bg-gray-50 border-b border-gray-100"
-          style={{ gridTemplateColumns: "2.5rem 4rem 1fr 1fr 3.5rem 5rem 4.5rem 4rem 4.5rem" }}>
-          {["#", "Image", "Name", "Category", "Unit", "Price", "Stock", "Disc%", ""].map((h, i) => (
-            <div key={i} className={`text-[11px] font-bold text-gray-400 uppercase tracking-wider ${i === 8 ? "text-right" : ""}`}>{h}</div>
+          style={{ gridTemplateColumns: "2.5rem 4rem 1fr 1fr 3.5rem 5rem 4.5rem 4rem 4.5rem 4.5rem" }}>
+          {["#", "Image", "Name", "Category", "Unit", "Price", "Stock", "Disc%", "Featured", ""].map((h, i) => (
+            <div key={i} className={`text-[11px] font-bold text-gray-400 uppercase tracking-wider ${i === 9 ? "text-right" : ""} ${i === 8 ? "text-center" : ""}`}>{h}</div>
           ))}
         </div>
 
@@ -264,7 +283,7 @@ export default function ViewGrocery() {
                   className={`grid px-5 py-3 border-b border-gray-50 last:border-0
                     transition-colors duration-150 group items-center
                     ${isEditing ? "bg-blue-50/40" : "hover:bg-gray-50/60"}`}
-                  style={{ gridTemplateColumns: "2.5rem 4rem 1fr 1fr 3.5rem 5rem 4.5rem 4rem 4.5rem" }}
+                  style={{ gridTemplateColumns: "2.5rem 4rem 1fr 1fr 3.5rem 5rem 4.5rem 4rem 4.5rem 4.5rem" }}
                 >
                   <div>
                     <span className="text-xs font-bold text-gray-300">{String(globalIdx).padStart(2, "0")}</span>
@@ -346,6 +365,21 @@ export default function ViewGrocery() {
                         <span className="text-[11px] text-gray-300 font-semibold">—</span>
                       )
                     )}
+                  </div>
+                  <div className="flex justify-center">
+                    <button
+                      onClick={() => toggleFeatured(item)}
+                      disabled={featuringId === item._id}
+                      title={item.featured ? "Shown in home-page Featured — click to remove" : "Show in home-page Featured"}
+                      aria-pressed={!!item.featured}
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all duration-150 disabled:opacity-50 ${
+                        item.featured ? "bg-amber-50 text-amber-500 hover:bg-amber-100" : "text-gray-300 hover:bg-gray-100 hover:text-amber-400"
+                      }`}
+                    >
+                      {featuringId === item._id
+                        ? <Loader2 className="w-4 h-4 animate-spin" />
+                        : <Star className={`w-4 h-4 ${item.featured ? "fill-current" : ""}`} />}
+                    </button>
                   </div>
                   <div className="flex justify-end items-center gap-1">
                     {isEditing ? (
